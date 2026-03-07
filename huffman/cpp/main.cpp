@@ -7,23 +7,23 @@
 
 class BitWriter {
 public:
-    explicit BitWriter(std::ostream& s) : stream(s), buffer(0), bitsInBuffer(0) {}
+    explicit BitWriter(std::ostream& s) : stream(s), buffer(0), bits_in_buffer(0) {}
 
     void write_bit(int bit) {
         buffer = static_cast<uint8_t>((buffer << 1) | (bit & 1));
-        bitsInBuffer++;
-        if (bitsInBuffer == 8) {
+        bits_in_buffer++;
+        if (bits_in_buffer == 8) {
             stream.put(static_cast<char>(buffer));
-            bitsInBuffer = 0;
+            bits_in_buffer = 0;
             buffer = 0;
         }
     }
 
     void flush() {
-        if (bitsInBuffer > 0) {
-            buffer <<= (8 - bitsInBuffer);
+        if (bits_in_buffer > 0) {
+            buffer <<= (8 - bits_in_buffer);
             stream.put(static_cast<char>(buffer));
-            bitsInBuffer = 0;
+            bits_in_buffer = 0;
             buffer = 0;
         }
     }
@@ -31,36 +31,36 @@ public:
 private:
     std::ostream& stream;
     uint8_t buffer;
-    int bitsInBuffer;
+    int bits_in_buffer;
 };
 
 class BitReader {
 public:
-    explicit BitReader(std::istream& s) : stream(s), currentByte(0), bitsRemaining(0), reachedEof(false) {}
+    explicit BitReader(std::istream& s) : stream(s), current_byte(0), bits_remaining(0), reached_eof(false) {}
 
     int read_bit() {
-        if (bitsRemaining == 0) {
+        if (bits_remaining == 0) {
             int c = stream.get();
             if (c == EOF) {
-                reachedEof = true;
+                reached_eof = true;
                 return 0;
             }
-            currentByte = static_cast<uint8_t>(c);
-            bitsRemaining = 8;
+            current_byte = static_cast<uint8_t>(c);
+            bits_remaining = 8;
         }
-        bitsRemaining--;
-        return (currentByte >> bitsRemaining) & 1;
+        bits_remaining--;
+        return (current_byte >> bits_remaining) & 1;
     }
 
     bool eof() const {
-        return reachedEof;
+        return reached_eof;
     }
 
 private:
     std::istream& stream;
-    uint8_t currentByte;
-    int bitsRemaining;
-    bool reachedEof;
+    uint8_t current_byte;
+    int bits_remaining;
+    bool reached_eof;
 };
 
 static const uint32_t SYMBOL_LIMIT = 257;
@@ -161,9 +161,9 @@ static void build_codes(Node* node, std::vector<std::string>& codes, std::string
     prefix.pop_back();
 }
 
-static std::vector<uint32_t> build_frequencies_from_file(const std::string& inputPath) {
+static std::vector<uint32_t> build_frequencies_from_file(const std::string& input_path) {
     std::vector<uint32_t> freq(SYMBOL_LIMIT, 0);
-    std::ifstream in(inputPath, std::ios::binary);
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         return freq;
     }
@@ -204,20 +204,20 @@ static bool read_frequencies(std::istream& in, std::vector<uint32_t>& freq) {
     return true;
 }
 
-static bool compress_file(const std::string& inputPath, const std::string& outputPath) {
-    std::vector<uint32_t> freq = build_frequencies_from_file(inputPath);
+static bool compress_file(const std::string& input_path, const std::string& output_path) {
+    std::vector<uint32_t> freq = build_frequencies_from_file(input_path);
     Node* root = build_tree(freq);
     std::vector<std::string> codes(SYMBOL_LIMIT);
     std::string prefix;
     build_codes(root, codes, prefix);
 
-    std::ifstream in(inputPath, std::ios::binary);
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         std::cerr << "Cannot open input file for reading\n";
         destroy_tree(root);
         return false;
     }
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
         std::cerr << "Cannot open output file for writing\n";
         destroy_tree(root);
@@ -228,20 +228,20 @@ static bool compress_file(const std::string& inputPath, const std::string& outpu
     out.write(magic, sizeof(magic));
     write_frequencies(out, freq);
 
-    BitWriter bitWriter(out);
+    BitWriter bit_writer(out);
     char c;
     while (in.get(c)) {
         uint32_t sym = static_cast<uint8_t>(c);
         const std::string& code = codes[sym];
         for (char b : code) {
-            bitWriter.write_bit(b == '1' ? 1 : 0);
+            bit_writer.write_bit(b == '1' ? 1 : 0);
         }
     }
-    const std::string& eofCode = codes[EOF_SYMBOL];
-    for (char b : eofCode) {
-        bitWriter.write_bit(b == '1' ? 1 : 0);
+    const std::string& eof_code = codes[EOF_SYMBOL];
+    for (char b : eof_code) {
+        bit_writer.write_bit(b == '1' ? 1 : 0);
     }
-    bitWriter.flush();
+    bit_writer.flush();
 
     if (in.bad()) {
         std::cerr << "Failed to read input file\n";
@@ -258,8 +258,8 @@ static bool compress_file(const std::string& inputPath, const std::string& outpu
     return true;
 }
 
-static bool decompress_file(const std::string& inputPath, const std::string& outputPath) {
-    std::ifstream in(inputPath, std::ios::binary);
+static bool decompress_file(const std::string& input_path, const std::string& output_path) {
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         std::cerr << "Cannot open input file for reading\n";
         return false;
@@ -280,19 +280,19 @@ static bool decompress_file(const std::string& inputPath, const std::string& out
         return false;
     }
 
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
         std::cerr << "Cannot open output file for writing\n";
         destroy_tree(root);
         return false;
     }
 
-    BitReader bitReader(in);
+    BitReader bit_reader(in);
     Node* node = root;
-    bool sawEOF = false;
+    bool saw_eof = false;
     bool ok = true;
     while (true) {
-        int bit = bitReader.read_bit();
+        int bit = bit_reader.read_bit();
         if (bit == 0) {
             node = node->left;
         } else {
@@ -305,7 +305,7 @@ static bool decompress_file(const std::string& inputPath, const std::string& out
         }
         if (is_leaf(node)) {
             if (node->symbol == EOF_SYMBOL) {
-                sawEOF = true;
+                saw_eof = true;
                 break;
             }
             unsigned char b = static_cast<unsigned char>(node->symbol);
@@ -317,12 +317,12 @@ static bool decompress_file(const std::string& inputPath, const std::string& out
             }
             node = root;
         }
-        if (bitReader.eof() && node == root) {
+        if (bit_reader.eof() && node == root) {
             break;
         }
     }
 
-    if (!sawEOF) {
+    if (!saw_eof) {
         std::cerr << "Input data corrupted or truncated\n";
         ok = false;
     }
@@ -330,12 +330,12 @@ static bool decompress_file(const std::string& inputPath, const std::string& out
     return ok;
 }
 
-void huffman_encode_file(const std::string& inputPath, const std::string& outputPath) {
-    (void)compress_file(inputPath, outputPath);
+void huffman_encode_file(const std::string& input_path, const std::string& output_path) {
+    (void)compress_file(input_path, output_path);
 }
 
-void huffman_decode_file(const std::string& inputPath, const std::string& outputPath) {
-    (void)decompress_file(inputPath, outputPath);
+void huffman_decode_file(const std::string& input_path, const std::string& output_path) {
+    (void)decompress_file(input_path, output_path);
 }
 
 int main(int argc, char** argv) {
@@ -344,15 +344,15 @@ int main(int argc, char** argv) {
         return 1;
     }
     std::string mode = argv[1];
-    std::string inputPath = argv[2];
-    std::string outputPath = argv[3];
+    std::string input_path = argv[2];
+    std::string output_path = argv[3];
 
     bool ok = true;
 
     if (mode == "encode") {
-        ok = compress_file(inputPath, outputPath);
+        ok = compress_file(input_path, output_path);
     } else if (mode == "decode") {
-        ok = decompress_file(inputPath, outputPath);
+        ok = decompress_file(input_path, output_path);
     } else {
         std::cerr << "Unknown mode\n";
         return 1;

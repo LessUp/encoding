@@ -2,6 +2,6 @@ go 1.21
 
 use (
 	./huffman/go
-	./Run-Length/go
+	./rle/go
 	./range/go
 )

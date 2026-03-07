@@ -6,7 +6,7 @@ import datetime
 
 # 统一基准测试脚本：
 # - 调用 tests/gen_testdata.py 生成测试数据
-# - 运行 Huffman / Arithmetic / Range / Run-Length 的基准测试
+# - 运行 Huffman / Arithmetic / Range / RLE 的基准测试
 # - 将各自输出写入 reports/ 目录下的文本文件
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -86,14 +86,14 @@ def main():
             title="Range coder Go benchmark",
         )
 
-    # Run-Length 跨语言 benchmark
-    rle_bench = ROOT / "Run-Length" / "benchmark" / "bench.py"
+    # RLE 跨语言 benchmark
+    rle_bench = ROOT / "rle" / "benchmark" / "bench.py"
     if rle_bench.is_file():
         run_capture(
             [PY, "bench.py", str(input_file)],
             cwd=rle_bench.parent,
             report_path=REPORTS_DIR / f"rle_report_{ts}.txt",
-            title="Run-Length benchmark",
+            title="RLE benchmark",
         )
 
     print("[run_all_bench] all done. Reports are in:")

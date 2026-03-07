@@ -40,7 +40,7 @@ jobs:
 
       - name: Build RLE C++
         run: |
-          cd Run-Length/cpp
+          cd rle/cpp
           g++ -std=c++17 -O2 -Wall -Wextra main.cpp -o rle_cpp
           ./rle_cpp || true
 
@@ -85,7 +85,7 @@ jobs:
 
       - name: Build RLE Go
         run: |
-          cd Run-Length/go
+          cd rle/go
           go vet ./...
           go test ./...
           go build -o rle_go .
@@ -107,7 +107,7 @@ jobs:
       - name: Check Rust formatting
         run: |
           # Check formatting for standalone Rust files
-          for file in huffman/rust/main.rs Run-Length/rust/main.rs; do
+          for file in huffman/rust/main.rs rle/rust/main.rs; do
             if [ -f "$file" ]; then
               rustfmt --check "$file" || exit 1
             fi
@@ -133,7 +133,7 @@ jobs:
 
       - name: Build RLE Rust
         run: |
-          cd Run-Length/rust
+          cd rle/rust
           rustc -O main.rs -o rle_rust
           rustc --test main.rs -o rle_rust_test
           ./rle_rust_test
@@ -170,15 +170,15 @@ jobs:
           cd huffman/cpp && g++ -std=c++17 -O2 main.cpp -o huffman_cpp && cd ../..
           cd arithmetic/cpp && g++ -std=c++17 -O2 main.cpp -o arithmetic_cpp && cd ../..
           cd range/cpp && g++ -std=c++17 -O2 main.cpp -o rangecoder_cpp && cd ../..
-          cd Run-Length/cpp && g++ -std=c++17 -O2 main.cpp -o rle_cpp && cd ../..
+          cd rle/cpp && g++ -std=c++17 -O2 main.cpp -o rle_cpp && cd ../..
           
           # Go
           cd huffman/go && go build -o huffman_go . && cd ../..
-          cd Run-Length/go && go build -o rle_go . && cd ../..
+          cd rle/go && go build -o rle_go . && cd ../..
           
           # Rust
           cd huffman/rust && rustc -O main.rs -o huffman_rust && cd ../..
-          cd Run-Length/rust && rustc -O main.rs -o rle_rust && cd ../..
+          cd rle/rust && rustc -O main.rs -o rle_rust && cd ../..
 
       - name: Test Huffman correctness
         run: |
@@ -210,22 +210,22 @@ jobs:
           TEST_FILE="tests/data/repetitive_10MiB.bin"
           
           echo "Testing RLE C++..."
-          ./Run-Length/cpp/rle_cpp encode "$TEST_FILE" /tmp/rle_cpp.enc
-          ./Run-Length/cpp/rle_cpp decode /tmp/rle_cpp.enc /tmp/rle_cpp.dec
+          ./rle/cpp/rle_cpp encode "$TEST_FILE" /tmp/rle_cpp.enc
+          ./rle/cpp/rle_cpp decode /tmp/rle_cpp.enc /tmp/rle_cpp.dec
           diff "$TEST_FILE" /tmp/rle_cpp.dec
           
           echo "Testing RLE Go..."
-          ./Run-Length/go/rle_go encode "$TEST_FILE" /tmp/rle_go.enc
-          ./Run-Length/go/rle_go decode /tmp/rle_go.enc /tmp/rle_go.dec
+          ./rle/go/rle_go encode "$TEST_FILE" /tmp/rle_go.enc
+          ./rle/go/rle_go decode /tmp/rle_go.enc /tmp/rle_go.dec
           diff "$TEST_FILE" /tmp/rle_go.dec
           
           echo "Testing RLE Rust..."
-          ./Run-Length/rust/rle_rust encode "$TEST_FILE" /tmp/rle_rust.enc
-          ./Run-Length/rust/rle_rust decode /tmp/rle_rust.enc /tmp/rle_rust.dec
+          ./rle/rust/rle_rust encode "$TEST_FILE" /tmp/rle_rust.enc
+          ./rle/rust/rle_rust decode /tmp/rle_rust.enc /tmp/rle_rust.dec
           diff "$TEST_FILE" /tmp/rle_rust.dec
           
           echo "Testing cross-language compatibility (C++ encode -> Rust decode)..."
-          ./Run-Length/rust/rle_rust decode /tmp/rle_cpp.enc /tmp/rle_cross.dec
+          ./rle/rust/rle_rust decode /tmp/rle_cpp.enc /tmp/rle_cross.dec
           diff "$TEST_FILE" /tmp/rle_cross.dec
           
           echo "RLE tests passed!"

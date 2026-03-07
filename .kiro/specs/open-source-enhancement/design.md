@@ -95,15 +95,15 @@ encoding/
 
 1. **build-cpp**: 编译所有 C++ 实现
    - Matrix: ubuntu-latest, macos-latest
-   - 编译 huffman/cpp, arithmetic/cpp, range/cpp, Run-Length/cpp
+   - 编译 huffman/cpp, arithmetic/cpp, range/cpp, rle/cpp
 
 2. **build-go**: 构建和检查 Go 实现
    - 运行 go build, go vet, go fmt -d
-   - 构建 huffman/go, range/go, Run-Length/go
+   - 构建 huffman/go, range/go, rle/go
 
 3. **build-rust**: 构建和检查 Rust 实现
    - 运行 cargo build, cargo clippy, cargo fmt --check
-   - 构建 huffman/rust, range/rust, Run-Length/rust
+   - 构建 huffman/rust, range/rust, rle/rust
 
 4. **test-correctness**: 验证编解码正确性
    - 生成测试数据

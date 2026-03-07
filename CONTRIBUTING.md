@@ -146,7 +146,7 @@ python3 scripts/run_all_bench.py
 
 # Run specific algorithm benchmark
 cd huffman/benchmark && python3 bench.py
-cd Run-Length/benchmark && python3 bench.py
+cd rle/benchmark && python3 bench.py
 ```
 
 ### Verifying Correctness | 验证正确性

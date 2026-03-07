@@ -48,16 +48,16 @@
     - 配置 push 和 pull_request 触发器
     - _Requirements: 5.1_
   - [x] 5.2 添加 C++ 构建任务
-    - 编译 huffman/cpp, arithmetic/cpp, range/cpp, Run-Length/cpp
+    - 编译 huffman/cpp, arithmetic/cpp, range/cpp, rle/cpp
     - 支持 ubuntu-latest 和 macos-latest
     - _Requirements: 5.2_
   - [x] 5.3 添加 Go 构建和检查任务
     - 运行 go build, go vet, gofmt 检查
-    - 构建 huffman/go, range/go, Run-Length/go
+    - 构建 huffman/go, range/go, rle/go
     - _Requirements: 5.3_
   - [x] 5.4 添加 Rust 构建和检查任务
     - 运行 cargo build, cargo clippy, cargo fmt --check
-    - 构建 huffman/rust, range/rust, Run-Length/rust
+    - 构建 huffman/rust, range/rust, rle/rust
     - _Requirements: 5.4_
   - [x] 5.5 添加正确性验证任务
     - 生成测试数据

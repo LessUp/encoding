@@ -27,7 +27,7 @@ static void scale_frequencies(std::vector<uint32_t>& freq) {
     if (total <= MAX_TOTAL) {
         return;
     }
-    uint64_t newTotal = 0;
+    uint64_t new_total = 0;
     for (size_t i = 0; i < freq.size(); i++) {
         if (freq[i] == 0) {
             continue;
@@ -37,9 +37,9 @@ static void scale_frequencies(std::vector<uint32_t>& freq) {
             scaled = 1;
         }
         freq[i] = static_cast<uint32_t>(scaled);
-        newTotal += scaled;
+        new_total += scaled;
     }
-    if (newTotal == 0) {
+    if (new_total == 0) {
         uint32_t base = MAX_TOTAL / static_cast<uint32_t>(freq.size());
         if (base == 0) {
             base = 1;
@@ -135,11 +135,11 @@ public:
     void encode_symbol(uint32_t symbol, const std::vector<uint32_t>& cumulative) {
         uint64_t range = static_cast<uint64_t>(high_) - low_ + 1;
         uint64_t total = cumulative.back();
-        uint64_t symLow = cumulative[symbol];
-        uint64_t symHigh = cumulative[symbol + 1];
+        uint64_t sym_low = cumulative[symbol];
+        uint64_t sym_high = cumulative[symbol + 1];
 
-        high_ = low_ + static_cast<uint32_t>((range * symHigh) / total - 1);
-        low_ = low_ + static_cast<uint32_t>((range * symLow) / total);
+        high_ = low_ + static_cast<uint32_t>((range * sym_high) / total - 1);
+        low_ = low_ + static_cast<uint32_t>((range * sym_low) / total);
 
         while ((low_ ^ high_) < RENORM_THRESHOLD) {
             uint8_t byte = static_cast<uint8_t>(low_ >> 24);
@@ -190,11 +190,11 @@ public:
         }
         uint32_t symbol = lo;
 
-        uint64_t symLow = cumulative[symbol];
-        uint64_t symHigh = cumulative[symbol + 1];
+        uint64_t sym_low = cumulative[symbol];
+        uint64_t sym_high = cumulative[symbol + 1];
 
-        high_ = low_ + static_cast<uint32_t>((range * symHigh) / total - 1);
-        low_ = low_ + static_cast<uint32_t>((range * symLow) / total);
+        high_ = low_ + static_cast<uint32_t>((range * sym_high) / total - 1);
+        low_ = low_ + static_cast<uint32_t>((range * sym_low) / total);
 
         while ((low_ ^ high_) < RENORM_THRESHOLD) {
             low_ <<= 8;
@@ -346,21 +346,21 @@ int main(int argc, char** argv) {
                 std::cerr << "Usage: " << argv[0] << " encode input output\n";
                 return 1;
             }
-            std::string inputPath = argv[2];
-            std::string outputPath = argv[3];
-            std::vector<uint8_t> data = read_file(inputPath);
+            std::string input_path = argv[2];
+            std::string output_path = argv[3];
+            std::vector<uint8_t> data = read_file(input_path);
             std::vector<uint8_t> encoded = range_coder::encode(data);
-            write_file(outputPath, encoded);
+            write_file(output_path, encoded);
         } else if (mode == "decode") {
             if (argc != 4) {
                 std::cerr << "Usage: " << argv[0] << " decode input output\n";
                 return 1;
             }
-            std::string inputPath = argv[2];
-            std::string outputPath = argv[3];
-            std::vector<uint8_t> encoded = read_file(inputPath);
+            std::string input_path = argv[2];
+            std::string output_path = argv[3];
+            std::vector<uint8_t> encoded = read_file(input_path);
             std::vector<uint8_t> decoded = range_coder::decode(encoded);
-            write_file(outputPath, decoded);
+            write_file(output_path, decoded);
         } else if (mode == "bench") {
             std::size_t size_bytes = 1u << 20; // 1 MiB
             int iterations = 20;

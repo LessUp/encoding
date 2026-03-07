@@ -46,25 +46,25 @@ static bool read_u32_le(std::istream& in, uint32_t& out_value) {
     return true;
 }
 
-static bool rle_encode_file_checked(const std::string& inputPath, const std::string& outputPath);
-static bool rle_decode_file_checked(const std::string& inputPath, const std::string& outputPath);
+static bool rle_encode_file_checked(const std::string& input_path, const std::string& output_path);
+static bool rle_decode_file_checked(const std::string& input_path, const std::string& output_path);
 
-void rle_encode_file(const std::string& inputPath, const std::string& outputPath) {
-    (void)rle_encode_file_checked(inputPath, outputPath);
+void rle_encode_file(const std::string& input_path, const std::string& output_path) {
+    (void)rle_encode_file_checked(input_path, output_path);
 }
 
 // 对整个文件进行 Run-Length 编码。
-// inputPath  为原始二进制文件路径。
-// outputPath 为编码后文件路径。
-static bool rle_encode_file_checked(const std::string& inputPath, const std::string& outputPath) {
-    std::ifstream in(inputPath, std::ios::binary);
+// input_path  为原始二进制文件路径。
+// output_path 为编码后文件路径。
+static bool rle_encode_file_checked(const std::string& input_path, const std::string& output_path) {
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
-        std::cerr << "无法打开输入文件用于读取: " << inputPath << "\n";
+        std::cerr << "无法打开输入文件用于读取: " << input_path << "\n";
         return false;
     }
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
-        std::cerr << "无法打开输出文件用于写入: " << outputPath << "\n";
+        std::cerr << "无法打开输出文件用于写入: " << output_path << "\n";
         return false;
     }
 
@@ -104,17 +104,17 @@ static bool rle_encode_file_checked(const std::string& inputPath, const std::str
 }
 
 // 对 RLE 编码后的文件进行解码，还原原始字节流。
-// inputPath  为已编码文件路径。
-// outputPath 为解码输出文件路径。
-static bool rle_decode_file_checked(const std::string& inputPath, const std::string& outputPath) {
-    std::ifstream in(inputPath, std::ios::binary);
+// input_path  为已编码文件路径。
+// output_path 为解码输出文件路径。
+static bool rle_decode_file_checked(const std::string& input_path, const std::string& output_path) {
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
-        std::cerr << "无法打开输入文件用于读取: " << inputPath << "\n";
+        std::cerr << "无法打开输入文件用于读取: " << input_path << "\n";
         return false;
     }
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
-        std::cerr << "无法打开输出文件用于写入: " << outputPath << "\n";
+        std::cerr << "无法打开输出文件用于写入: " << output_path << "\n";
         return false;
     }
 
@@ -137,12 +137,12 @@ static bool rle_decode_file_checked(const std::string& inputPath, const std::str
             return false;
         }
 
-        char valueChar;
-        if (!in.get(valueChar)) {
+        char value_char;
+        if (!in.get(value_char)) {
             std::cerr << "RLE 数据截断：缺少 value 字节\n";
             return false;
         }
-        unsigned char value = static_cast<unsigned char>(valueChar);
+        unsigned char value = static_cast<unsigned char>(value_char);
 
         while (count > 0) {
             std::size_t chunk = static_cast<std::size_t>(std::min<uint32_t>(count, static_cast<uint32_t>(BUF_SIZE)));
@@ -159,8 +159,8 @@ static bool rle_decode_file_checked(const std::string& inputPath, const std::str
     return true;
 }
 
-void rle_decode_file(const std::string& inputPath, const std::string& outputPath) {
-    (void)rle_decode_file_checked(inputPath, outputPath);
+void rle_decode_file(const std::string& input_path, const std::string& output_path) {
+    (void)rle_decode_file_checked(input_path, output_path);
 }
 
 int main(int argc, char** argv) {
@@ -169,15 +169,15 @@ int main(int argc, char** argv) {
         return 1;
     }
     std::string mode = argv[1];
-    std::string inputPath = argv[2];
-    std::string outputPath = argv[3];
+    std::string input_path = argv[2];
+    std::string output_path = argv[3];
 
     bool ok = true;
 
     if (mode == "encode") {
-        ok = rle_encode_file_checked(inputPath, outputPath);
+        ok = rle_encode_file_checked(input_path, output_path);
     } else if (mode == "decode") {
-        ok = rle_decode_file_checked(inputPath, outputPath);
+        ok = rle_decode_file_checked(input_path, output_path);
     } else {
         std::cerr << "未知模式: " << mode << "，应为 encode 或 decode\n";
         return 1;

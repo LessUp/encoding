@@ -19,6 +19,14 @@ tests/data/*.bin
 **/rle_go
 **/huffman_rust
 **/rle_rust
+**/huffman_rust_test
+**/rle_rust_test
 __pycache__/
 **/__pycache__/
 .pytest_cache/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+coverage.out

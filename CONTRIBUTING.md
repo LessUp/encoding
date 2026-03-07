@@ -52,7 +52,7 @@ brew install gcc go rust python3
 1. **Fork and clone the repository | Fork 并克隆仓库**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/encoding.git
+git clone https://github.com/LessUp/encoding.git
 cd encoding
 ```
 

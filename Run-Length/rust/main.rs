@@ -140,6 +140,54 @@ pub fn rle_decode_file(input_path: &str, output_path: &str) -> io::Result<()> {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn make_paths(prefix: &str) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
+        let mut dir = std::env::temp_dir();
+        let stamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        dir.push(format!("encoding_rle_{}_{}_{}", prefix, std::process::id(), stamp));
+        fs::create_dir_all(&dir).unwrap();
+        let input = dir.join("input.bin");
+        let encoded = dir.join("encoded.rle");
+        let output = dir.join("output.bin");
+        (dir, input, encoded, output)
+    }
+
+    #[test]
+    fn roundtrip_bytes() {
+        let (dir, input, encoded, output) = make_paths("roundtrip");
+        let mut data = vec![0xAA; 2048];
+        data.extend_from_slice(&b"run-length-rust-test-data-".repeat(128));
+        data.extend(std::iter::repeat(0x00).take(512));
+        fs::write(&input, &data).unwrap();
+
+        rle_encode_file(input.to_str().unwrap(), encoded.to_str().unwrap()).unwrap();
+        rle_decode_file(encoded.to_str().unwrap(), output.to_str().unwrap()).unwrap();
+
+        let decoded = fs::read(&output).unwrap();
+        assert_eq!(decoded, data);
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn decode_rejects_zero_count() {
+        let (dir, input, _, output) = make_paths("invalid");
+        fs::write(&input, [0u8, 0, 0, 0, 0x42]).unwrap();
+
+        let result = rle_decode_file(input.to_str().unwrap(), output.to_str().unwrap());
+        assert!(result.is_err());
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 4 {

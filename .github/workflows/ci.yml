@@ -74,6 +74,7 @@ jobs:
         run: |
           cd huffman/go
           go vet ./...
+          go test ./...
           go build -o huffman_go .
 
       - name: Build Range coder Go
@@ -86,6 +87,7 @@ jobs:
         run: |
           cd Run-Length/go
           go vet ./...
+          go test ./...
           go build -o rle_go .
 
   # Build and check Rust implementations
@@ -119,17 +121,22 @@ jobs:
         run: |
           cd huffman/rust
           rustc -O main.rs -o huffman_rust
+          rustc --test main.rs -o huffman_rust_test
+          ./huffman_rust_test
 
       - name: Build and check Range coder Rust
         run: |
           cd range/rust
           cargo clippy -- -D warnings
+          cargo test
           cargo build --release
 
       - name: Build RLE Rust
         run: |
           cd Run-Length/rust
           rustc -O main.rs -o rle_rust
+          rustc --test main.rs -o rle_rust_test
+          ./rle_rust_test
 
   # Verify encode/decode correctness
   test-correctness:
@@ -162,6 +169,7 @@ jobs:
           # C++
           cd huffman/cpp && g++ -std=c++17 -O2 main.cpp -o huffman_cpp && cd ../..
           cd arithmetic/cpp && g++ -std=c++17 -O2 main.cpp -o arithmetic_cpp && cd ../..
+          cd range/cpp && g++ -std=c++17 -O2 main.cpp -o rangecoder_cpp && cd ../..
           cd Run-Length/cpp && g++ -std=c++17 -O2 main.cpp -o rle_cpp && cd ../..
           
           # Go
@@ -232,6 +240,17 @@ jobs:
           diff "$TEST_FILE" /tmp/arith.dec
           
           echo "Arithmetic tests passed!"
+
+      - name: Test Range coder C++ correctness
+        run: |
+          TEST_FILE="tests/data/random_1MiB.bin"
+          
+          echo "Testing Range coder C++..."
+          ./range/cpp/rangecoder_cpp encode "$TEST_FILE" /tmp/range_cpp.enc
+          ./range/cpp/rangecoder_cpp decode /tmp/range_cpp.enc /tmp/range_cpp.dec
+          diff "$TEST_FILE" /tmp/range_cpp.dec
+          
+          echo "Range coder C++ tests passed!"
 
   # Run Go tests for Range coder
   test-range-go:

@@ -204,10 +204,6 @@ fn build_frequencies_from_file(path: &str) -> Vec<u32> {
     freq
 }
 
-fn default_frequencies() -> Vec<u32> {
-    vec![1u32; SYMBOL_LIMIT]
-}
-
 fn write_frequencies<W: Write>(writer: &mut W, freq: &[u32]) -> io::Result<()> {
     let count = freq.len() as u32;
     writer.write_all(&count.to_le_bytes())?;
@@ -367,6 +363,56 @@ pub fn huffman_encode_file(input_path: &str, output_path: &str) -> io::Result<()
 
 pub fn huffman_decode_file(input_path: &str, output_path: &str) -> io::Result<()> {
     decompress_file(input_path, output_path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn make_paths(prefix: &str) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
+        let mut dir = std::env::temp_dir();
+        let stamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        dir.push(format!("encoding_huffman_{}_{}_{}", prefix, std::process::id(), stamp));
+        fs::create_dir_all(&dir).unwrap();
+        let input = dir.join("input.bin");
+        let encoded = dir.join("encoded.huf");
+        let output = dir.join("output.bin");
+        (dir, input, encoded, output)
+    }
+
+    #[test]
+    fn roundtrip_bytes() {
+        let (dir, input, encoded, output) = make_paths("roundtrip");
+        let mut data = b"huffman-rust-test-data-".repeat(256);
+        data.extend_from_slice(&[0, 1, 2, 3, 254, 255]);
+        fs::write(&input, &data).unwrap();
+
+        huffman_encode_file(input.to_str().unwrap(), encoded.to_str().unwrap()).unwrap();
+        huffman_decode_file(encoded.to_str().unwrap(), output.to_str().unwrap()).unwrap();
+
+        let decoded = fs::read(&output).unwrap();
+        assert_eq!(decoded, data);
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn roundtrip_empty() {
+        let (dir, input, encoded, output) = make_paths("empty");
+        fs::write(&input, Vec::<u8>::new()).unwrap();
+
+        huffman_encode_file(input.to_str().unwrap(), encoded.to_str().unwrap()).unwrap();
+        huffman_decode_file(encoded.to_str().unwrap(), output.to_str().unwrap()).unwrap();
+
+        let decoded = fs::read(&output).unwrap();
+        assert!(decoded.is_empty());
+        fs::remove_dir_all(dir).unwrap();
+    }
 }
 
 fn main() {

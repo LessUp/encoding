@@ -1,6 +1,6 @@
 # encoding 编码算法集合 | Encoding Algorithms Collection
 
-[![CI](https://github.com/YOUR_USERNAME/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/encoding/actions/workflows/ci.yml)
+[![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![C++](https://img.shields.io/badge/C++-17-blue.svg)
 ![Go](https://img.shields.io/badge/Go-1.19+-00ADD8.svg)
@@ -63,7 +63,7 @@
 
 ```bash
 # Clone the repository | 克隆仓库
-git clone https://github.com/YOUR_USERNAME/encoding.git
+git clone https://github.com/LessUp/encoding.git
 cd encoding
 
 # Example: Huffman encoding | 示例：Huffman 编码

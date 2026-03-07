@@ -102,7 +102,7 @@ encoding/
 │   ├── cpp/          # C++ implementation
 │   ├── go/           # Go implementation
 │   └── rust/         # Rust implementation
-├── Run-Length/       # RLE encoding | 游程编码
+├── rle/              # RLE encoding | 游程编码
 │   ├── cpp/          # C++ implementation
 │   ├── go/           # Go implementation
 │   ├── rust/         # Rust implementation

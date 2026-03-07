@@ -6,23 +6,23 @@
 
 class BitWriter {
 public:
-    explicit BitWriter(std::ostream& s) : stream(s), buffer(0), bitsInBuffer(0) {}
+    explicit BitWriter(std::ostream& s) : stream(s), buffer(0), bits_in_buffer(0) {}
 
     void write_bit(int bit) {
         buffer = static_cast<uint8_t>((buffer << 1) | (bit & 1));
-        bitsInBuffer++;
-        if (bitsInBuffer == 8) {
+        bits_in_buffer++;
+        if (bits_in_buffer == 8) {
             stream.put(static_cast<char>(buffer));
-            bitsInBuffer = 0;
+            bits_in_buffer = 0;
             buffer = 0;
         }
     }
 
     void flush() {
-        if (bitsInBuffer > 0) {
-            buffer <<= (8 - bitsInBuffer);
+        if (bits_in_buffer > 0) {
+            buffer <<= (8 - bits_in_buffer);
             stream.put(static_cast<char>(buffer));
-            bitsInBuffer = 0;
+            bits_in_buffer = 0;
             buffer = 0;
         }
     }
@@ -30,51 +30,51 @@ public:
 private:
     std::ostream& stream;
     uint8_t buffer;
-    int bitsInBuffer;
+    int bits_in_buffer;
 };
 
 class BitReader {
 public:
-    explicit BitReader(std::istream& s) : stream(s), currentByte(0), bitsRemaining(0), reachedEof(false) {}
+    explicit BitReader(std::istream& s) : stream(s), current_byte(0), bits_remaining(0), reached_eof(false) {}
 
     int read_bit() {
-        if (bitsRemaining == 0) {
+        if (bits_remaining == 0) {
             int c = stream.get();
             if (c == EOF) {
-                reachedEof = true;
+                reached_eof = true;
                 return 0;
             }
-            currentByte = static_cast<uint8_t>(c);
-            bitsRemaining = 8;
+            current_byte = static_cast<uint8_t>(c);
+            bits_remaining = 8;
         }
-        bitsRemaining--;
-        return (currentByte >> bitsRemaining) & 1;
+        bits_remaining--;
+        return (current_byte >> bits_remaining) & 1;
     }
 
     bool eof() const {
-        return reachedEof;
+        return reached_eof;
     }
 
 private:
     std::istream& stream;
-    uint8_t currentByte;
-    int bitsRemaining;
-    bool reachedEof;
+    uint8_t current_byte;
+    int bits_remaining;
+    bool reached_eof;
 };
 
 class ArithmeticEncoder {
 public:
     explicit ArithmeticEncoder(BitWriter& w)
-        : writer(w), low(0), high(FULL_RANGE - 1), pendingBits(0) {}
+        : writer(w), low(0), high(FULL_RANGE - 1), pending_bits(0) {}
 
     void encode_symbol(uint32_t symbol, const std::vector<uint32_t>& cumulative) {
         uint64_t range = high - low + 1;
         uint64_t total = cumulative.back();
-        uint64_t symLow = cumulative[symbol];
-        uint64_t symHigh = cumulative[symbol + 1];
+        uint64_t sym_low = cumulative[symbol];
+        uint64_t sym_high = cumulative[symbol + 1];
 
-        high = low + (range * symHigh) / total - 1;
-        low = low + (range * symLow) / total;
+        high = low + (range * sym_high) / total - 1;
+        low = low + (range * sym_low) / total;
 
         for (;;) {
             if (high < HALF_RANGE) {
@@ -84,7 +84,7 @@ public:
                 low -= HALF_RANGE;
                 high -= HALF_RANGE;
             } else if (low >= FIRST_QUARTER && high < THIRD_QUARTER) {
-                pendingBits++;
+                pending_bits++;
                 low -= FIRST_QUARTER;
                 high -= FIRST_QUARTER;
             } else {
@@ -96,7 +96,7 @@ public:
     }
 
     void finish() {
-        pendingBits++;
+        pending_bits++;
         if (low < FIRST_QUARTER) {
             output_bit(0);
         } else {
@@ -115,14 +115,14 @@ private:
     BitWriter& writer;
     uint64_t low;
     uint64_t high;
-    uint64_t pendingBits;
+    uint64_t pending_bits;
 
     void output_bit(int bit) {
         writer.write_bit(bit);
         int complement = bit ^ 1;
-        while (pendingBits > 0) {
+        while (pending_bits > 0) {
             writer.write_bit(complement);
-            pendingBits--;
+            pending_bits--;
         }
     }
 };
@@ -154,11 +154,11 @@ public:
         }
         uint32_t symbol = lo;
 
-        uint64_t symLow = cumulative[symbol];
-        uint64_t symHigh = cumulative[symbol + 1];
+        uint64_t sym_low = cumulative[symbol];
+        uint64_t sym_high = cumulative[symbol + 1];
 
-        high = low + (range * symHigh) / total - 1;
-        low = low + (range * symLow) / total;
+        high = low + (range * sym_high) / total - 1;
+        low = low + (range * sym_low) / total;
 
         for (;;) {
             if (high < HALF_RANGE) {
@@ -212,7 +212,7 @@ static void scale_frequencies(std::vector<uint32_t>& freq) {
     if (total <= MAX_TOTAL) {
         return;
     }
-    uint64_t newTotal = 0;
+    uint64_t new_total = 0;
     for (size_t i = 0; i < freq.size(); i++) {
         if (freq[i] == 0) {
             continue;
@@ -222,9 +222,9 @@ static void scale_frequencies(std::vector<uint32_t>& freq) {
             scaled = 1;
         }
         freq[i] = static_cast<uint32_t>(scaled);
-        newTotal += scaled;
+        new_total += scaled;
     }
-    if (newTotal == 0) {
+    if (new_total == 0) {
         uint32_t base = MAX_TOTAL / static_cast<uint32_t>(freq.size());
         if (base == 0) {
             base = 1;
@@ -235,9 +235,9 @@ static void scale_frequencies(std::vector<uint32_t>& freq) {
     }
 }
 
-static std::vector<uint32_t> build_frequencies_from_file(const std::string& inputPath) {
+static std::vector<uint32_t> build_frequencies_from_file(const std::string& input_path) {
     std::vector<uint32_t> freq(SYMBOL_LIMIT, 0);
-    std::ifstream in(inputPath, std::ios::binary);
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         return freq;
     }
@@ -292,16 +292,16 @@ static bool read_frequencies(std::istream& in, std::vector<uint32_t>& freq) {
     return true;
 }
 
-static bool compress_file(const std::string& inputPath, const std::string& outputPath) {
-    std::vector<uint32_t> freq = build_frequencies_from_file(inputPath);
+static bool compress_file(const std::string& input_path, const std::string& output_path) {
+    std::vector<uint32_t> freq = build_frequencies_from_file(input_path);
     std::vector<uint32_t> cumulative = build_cumulative(freq);
 
-    std::ifstream in(inputPath, std::ios::binary);
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         std::cerr << "Cannot open input file for reading\n";
         return false;
     }
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
         std::cerr << "Cannot open output file for writing\n";
         return false;
@@ -311,8 +311,8 @@ static bool compress_file(const std::string& inputPath, const std::string& outpu
     out.write(magic, sizeof(magic));
     write_frequencies(out, freq);
 
-    BitWriter bitWriter(out);
-    ArithmeticEncoder encoder(bitWriter);
+    BitWriter bit_writer(out);
+    ArithmeticEncoder encoder(bit_writer);
 
     char c;
     while (in.get(c)) {
@@ -334,8 +334,8 @@ static bool compress_file(const std::string& inputPath, const std::string& outpu
     return true;
 }
 
-static bool decompress_file(const std::string& inputPath, const std::string& outputPath) {
-    std::ifstream in(inputPath, std::ios::binary);
+static bool decompress_file(const std::string& input_path, const std::string& output_path) {
+    std::ifstream in(input_path, std::ios::binary);
     if (!in) {
         std::cerr << "Cannot open input file for reading\n";
         return false;
@@ -353,14 +353,14 @@ static bool decompress_file(const std::string& inputPath, const std::string& out
     }
     std::vector<uint32_t> cumulative = build_cumulative(freq);
 
-    std::ofstream out(outputPath, std::ios::binary);
+    std::ofstream out(output_path, std::ios::binary);
     if (!out) {
         std::cerr << "Cannot open output file for writing\n";
         return false;
     }
 
-    BitReader bitReader(in);
-    ArithmeticDecoder decoder(bitReader);
+    BitReader bit_reader(in);
+    ArithmeticDecoder decoder(bit_reader);
 
     for (;;) {
         uint32_t sym = decoder.decode_symbol(cumulative);
@@ -384,15 +384,15 @@ int main(int argc, char** argv) {
         return 1;
     }
     std::string mode = argv[1];
-    std::string inputPath = argv[2];
-    std::string outputPath = argv[3];
+    std::string input_path = argv[2];
+    std::string output_path = argv[3];
 
     bool ok = true;
 
     if (mode == "encode") {
-        ok = compress_file(inputPath, outputPath);
+        ok = compress_file(input_path, output_path);
     } else if (mode == "decode") {
-        ok = decompress_file(inputPath, outputPath);
+        ok = decompress_file(input_path, output_path);
     } else {
         std::cerr << "Unknown mode\n";
         return 1;

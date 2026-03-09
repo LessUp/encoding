@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added | 新增
+- VitePress SEO: Open Graph / Twitter Card meta tags, sitemap, cleanUrls
+- Docs landing page: feature cards with anchor links, richer hero tagline
+- Docs algorithms page: complexity analysis table, Huffman/Arithmetic comparison, Range Coder vs Arithmetic differences
+- Docs getting-started: code-group tabs, Makefile command table, structured environment requirements
+- Docs project-structure: CI/CD table, file format table, enhanced directory tree
+- Site favicon (logo.svg)
 - Arithmetic coding Go implementation with full test suite
 - Arithmetic coding Rust implementation with full test suite
 - Range coder Go CLI (`range/go/cmd/main.go`) for cross-language testing
@@ -22,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI cross-language correctness tests for Arithmetic and Range coder (all 3 languages)
 
 ### Changed | 变更
+- Pages workflow: sparse-checkout (skip algorithm source), Node 20→22, package-lock.json path trigger
+- VitePress sidebar restructured into "入门" + "算法" groups, nav added "相关链接" dropdown
+- README.md: fixed dead doc links (algorithms, benchmarks → guide/ paths)
 - Upgraded Arithmetic benchmark from C++-only to cross-language (C++, Go, Rust)
 - Overhauled Makefile with complete build/test/clean targets for all algorithms and languages
 - Updated CI workflow: full build, test, and cross-language verification for all 4 algorithms × 3 languages
@@ -32,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated README: algorithm table, project structure, Go version badge (1.21+), roadmap
 
 ### Fixed | 修复
+- README badge URL: `docs.yml` → `pages.yml` (both EN & ZH READMEs)
+- README algorithm table: "LZ77" → "Range Coder" (matched actual project directory)
+- README project structure: `lz77/` → `range/`
+- `.gitignore`: removed bare `Makefile` pattern that could shadow root Makefile
 - Fixed Makefile `build-range` target (was running `go test` instead of building CLI)
 - Fixed Makefile `clean` target (replaced fragile Python one-liner with proper `rm` commands)
 

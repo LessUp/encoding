@@ -8,6 +8,23 @@ export default defineConfig({
   // GitHub Pages 部署：base 需要与仓库名一致
   base: '/encoding/',
 
+  cleanUrls: true,
+
+  sitemap: {
+    hostname: 'https://lessup.github.io/encoding/',
+  },
+
+  head: [
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'Encoding — 编码算法集合' }],
+    ['meta', { property: 'og:description', content: '用 C++、Go、Rust 多语言实现经典压缩编码算法，学习与对比' }],
+    ['meta', { property: 'og:url', content: 'https://lessup.github.io/encoding/' }],
+    ['meta', { name: 'twitter:card', content: 'summary' }],
+    ['meta', { name: 'twitter:title', content: 'Encoding — 编码算法集合' }],
+    ['meta', { name: 'twitter:description', content: '用 C++、Go、Rust 多语言实现经典压缩编码算法，学习与对比' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/encoding/logo.svg' }],
+  ],
+
   markdown: {
     lineNumbers: true,
     languageAlias: {
@@ -22,15 +39,27 @@ export default defineConfig({
       { text: '指南', link: '/guide/getting-started' },
       { text: '算法详解', link: '/guide/algorithms' },
       { text: '项目结构', link: '/guide/project-structure' },
+      {
+        text: '相关链接',
+        items: [
+          { text: 'GitHub', link: 'https://github.com/LessUp/encoding' },
+          { text: 'CHANGELOG', link: 'https://github.com/LessUp/encoding/blob/master/CHANGELOG.md' },
+        ],
+      },
     ],
 
     sidebar: [
       {
-        text: '指南',
+        text: '入门',
         items: [
           { text: '快速开始', link: '/guide/getting-started' },
-          { text: '算法详解', link: '/guide/algorithms' },
           { text: '项目结构', link: '/guide/project-structure' },
+        ],
+      },
+      {
+        text: '算法',
+        items: [
+          { text: '算法总览与对比', link: '/guide/algorithms' },
         ],
       },
     ],

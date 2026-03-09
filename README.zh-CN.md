@@ -1,7 +1,7 @@
 # encoding 编码算法集合 | Encoding Algorithms Collection
 
 [![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
-[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/docs.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/docs.yml)
+[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/pages.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [English](README.md) | 简体中文

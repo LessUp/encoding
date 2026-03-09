@@ -1,10 +1,13 @@
 # encoding 编码算法集合 | Encoding Algorithms Collection
 
 [![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
+[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/docs.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/docs.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![C++](https://img.shields.io/badge/C++-17-blue.svg)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8.svg)
 ![Rust](https://img.shields.io/badge/Rust-1.70+-orange.svg)
+
+> 📖 **文档站 | Docs**：[https://lessup.github.io/encoding/](https://lessup.github.io/encoding/)
 
 > 🎓 一个用多种语言实现经典压缩编码算法的学习与对比项目
 >

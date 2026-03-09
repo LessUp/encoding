@@ -3,7 +3,7 @@
 [![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![C++](https://img.shields.io/badge/C++-17-blue.svg)
-![Go](https://img.shields.io/badge/Go-1.19+-00ADD8.svg)
+![Go](https://img.shields.io/badge/Go-1.21+-00ADD8.svg)
 ![Rust](https://img.shields.io/badge/Rust-1.70+-orange.svg)
 
 > 🎓 一个用多种语言实现经典压缩编码算法的学习与对比项目
@@ -33,7 +33,7 @@
 | Algorithm | Best For | Compression Ratio | Speed | Languages |
 |-----------|----------|-------------------|-------|-----------|
 | **Huffman** | General purpose, text | Medium | Fast | C++, Go, Rust |
-| **Arithmetic** | Maximum compression | High | Medium | C++ |
+| **Arithmetic** | Maximum compression | High | Medium | C++, Go, Rust |
 | **Range Coder** | Balanced performance | High | Fast | C++, Go, Rust |
 | **RLE** | Repetitive data | Variable* | Very Fast | C++, Go, Rust |
 
@@ -42,7 +42,7 @@
 | 算法 | 适用场景 | 压缩率 | 速度 | 支持语言 |
 |------|----------|--------|------|----------|
 | **Huffman** | 通用、文本 | 中等 | 快 | C++, Go, Rust |
-| **Arithmetic** | 追求最大压缩 | 高 | 中等 | C++ |
+| **Arithmetic** | 追求最大压缩 | 高 | 中等 | C++, Go, Rust |
 | **Range Coder** | 平衡性能 | 高 | 快 | C++, Go, Rust |
 | **RLE** | 重复数据 | 可变* | 非常快 | C++, Go, Rust |
 
@@ -55,7 +55,7 @@
 ### Prerequisites | 前置要求
 
 - C++ compiler (g++ 9+ or clang++ 10+)
-- Go 1.19+
+- Go 1.21+
 - Rust 1.70+
 - Python 3.8+ (for benchmarks)
 
@@ -97,11 +97,15 @@ encoding/
 │   ├── rust/         # Rust implementation
 │   └── benchmark/    # Cross-language benchmark
 ├── arithmetic/        # Arithmetic coding | 算术编码
-│   └── cpp/          # C++ implementation
-├── range/            # Range coder | 区间编码
 │   ├── cpp/          # C++ implementation
 │   ├── go/           # Go implementation
-│   └── rust/         # Rust implementation
+│   ├── rust/         # Rust implementation
+│   └── benchmark/    # Cross-language benchmark
+├── range/            # Range coder | 区间编码
+│   ├── cpp/          # C++ implementation
+│   ├── go/           # Go implementation (library + CLI)
+│   ├── rust/         # Rust implementation (library + CLI)
+│   └── benchmark/    # Cross-language benchmark
 ├── rle/              # RLE encoding | 游程编码
 │   ├── cpp/          # C++ implementation
 │   ├── go/           # Go implementation
@@ -138,9 +142,19 @@ Uses interval subdivision to represent message probability, achieving compressio
 
 An implementation equivalent to arithmetic coding but often more efficient in practice.
 
-**API**:
+**API (library)**:
 - Go: `rangecoder.Encode(data []byte) ([]byte, error)`
 - Rust: `rangecoder::encode(input: &[u8]) -> Result<Vec<u8>, RangeError>`
+
+**CLI**:
+```bash
+# C++
+./rangecoder_cpp encode input.bin output.rcnc
+# Go
+./rangecoder_go encode input.bin output.rcnc
+# Rust
+cargo run --bin rangecoder -- encode input.bin output.rcnc
+```
 
 ### Run-Length Encoding (RLE) | 游程编码
 
@@ -227,6 +241,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Roadmap | 路线图
 
+- [x] All 4 algorithms implemented in C++, Go, Rust
+- [x] Cross-language encode/decode compatibility for all algorithms
+- [x] Unified CLI interface and cross-language benchmarks
 - [ ] Add more compression algorithms (LZ77, LZ78, LZSS)
 - [ ] Add Python implementations
 - [ ] Add WebAssembly builds for browser demos

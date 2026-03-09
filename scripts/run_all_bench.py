@@ -54,36 +54,24 @@ def main():
             title="Huffman benchmark",
         )
 
-    # Arithmetic C++ benchmark
+    # Arithmetic 跨语言 benchmark
     arithmetic_bench = ROOT / "arithmetic" / "benchmark" / "bench.py"
     if arithmetic_bench.is_file():
         run_capture(
             [PY, "bench.py", str(input_file)],
             cwd=arithmetic_bench.parent,
-            report_path=REPORTS_DIR / f"arithmetic_cpp_report_{ts}.txt",
-            title="Arithmetic C++ benchmark",
+            report_path=REPORTS_DIR / f"arithmetic_report_{ts}.txt",
+            title="Arithmetic benchmark",
         )
 
-    # Range coder Rust benchmark (cargo bin bench)
-    range_rust_dir = ROOT / "range" / "rust"
-    cargo_toml = range_rust_dir / "Cargo.toml"
-    if cargo_toml.is_file():
+    # Range coder 跨语言 benchmark
+    range_bench = ROOT / "range" / "benchmark" / "bench.py"
+    if range_bench.is_file():
         run_capture(
-            ["cargo", "run", "--bin", "bench", "--release"],
-            cwd=range_rust_dir,
-            report_path=REPORTS_DIR / f"range_rust_report_{ts}.txt",
-            title="Range coder Rust benchmark",
-        )
-
-    # Range coder Go benchmark (go test -bench .)
-    range_go_dir = ROOT / "range" / "go"
-    go_mod = range_go_dir / "go.mod"
-    if go_mod.is_file():
-        run_capture(
-            ["go", "test", "-bench", "."],
-            cwd=range_go_dir,
-            report_path=REPORTS_DIR / f"range_go_report_{ts}.txt",
-            title="Range coder Go benchmark",
+            [PY, "bench.py", str(input_file)],
+            cwd=range_bench.parent,
+            report_path=REPORTS_DIR / f"range_report_{ts}.txt",
+            title="Range coder benchmark",
         )
 
     # RLE 跨语言 benchmark

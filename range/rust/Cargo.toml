@@ -8,6 +8,10 @@ name = "rangecoder"
 path = "src/lib.rs"
 
 [[bin]]
+name = "rangecoder"
+path = "src/bin/rangecoder.rs"
+
+[[bin]]
 name = "bench"
 path = "src/bin/bench.rs"
 

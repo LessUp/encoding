@@ -6,6 +6,8 @@ tests/data/*.bin
 **/*.out
 **/*.huf
 **/*.rle
+**/*.aenc
+**/*.rcnc
 **/*.exe
 **/*.o
 **/*.a
@@ -16,10 +18,14 @@ tests/data/*.bin
 **/rle_cpp
 **/rangecoder_cpp
 **/huffman_go
+**/arithmetic_go
+**/rangecoder_go
 **/rle_go
 **/huffman_rust
+**/arithmetic_rust
 **/rle_rust
 **/huffman_rust_test
+**/arithmetic_rust_test
 **/rle_rust_test
 __pycache__/
 **/__pycache__/

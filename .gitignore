@@ -67,6 +67,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Node (VitePress docs)
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
 # Logs & temp
 *.log
 *.tmp

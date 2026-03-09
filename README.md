@@ -1,7 +1,7 @@
 # Encoding Algorithms Collection
 
 [![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
-[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/docs.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/docs.yml)
+[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/pages.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![C++](https://img.shields.io/badge/C++-17-blue.svg)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8.svg)
@@ -19,7 +19,7 @@ A multi-language implementation of classic compression encoding algorithms for l
 |-----------|-----|-----|------|-------------|
 | **Arithmetic Coding** | ✅ | ✅ | ✅ | Entropy-optimal encoding with fractional bit precision |
 | **Huffman Coding** | ✅ | ✅ | ✅ | Classic prefix-free variable-length encoding |
-| **LZ77** | ✅ | ✅ | ✅ | Sliding window dictionary compression |
+| **Range Coder** | ✅ | ✅ | ✅ | Arithmetic coding variant, balanced speed & ratio |
 | **Run-Length Encoding** | ✅ | ✅ | ✅ | Simple repeated symbol compression |
 
 ## Features
@@ -64,7 +64,7 @@ cargo test
 encoding/
 ├── arithmetic/         # Arithmetic coding (C++, Go, Rust)
 ├── huffman/            # Huffman coding (C++, Go, Rust)
-├── lz77/              # LZ77 compression (C++, Go, Rust)
+├── range/             # Range coder (C++, Go, Rust)
 ├── rle/               # Run-length encoding (C++, Go, Rust)
 ├── docs/              # Documentation
 └── .github/workflows/ # CI
@@ -73,8 +73,8 @@ encoding/
 ## Documentation
 
 - [Online Docs](https://lessup.github.io/encoding/)
-- [Algorithm Deep Dives](https://lessup.github.io/encoding/algorithms)
-- [Performance Comparison](https://lessup.github.io/encoding/benchmarks)
+- [Algorithm Deep Dives](https://lessup.github.io/encoding/guide/algorithms)
+- [Project Structure](https://lessup.github.io/encoding/guide/project-structure)
 
 ## License
 

@@ -60,7 +60,6 @@ jobs:
 
       - name: Check Go formatting
         run: |
-          # Check if any files need formatting
           unformatted=$(gofmt -l .)
           if [ -n "$unformatted" ]; then
             echo "The following files are not formatted:"
@@ -77,11 +76,19 @@ jobs:
           go test ./...
           go build -o huffman_go .
 
+      - name: Build Arithmetic Go
+        run: |
+          cd arithmetic/go
+          go vet ./...
+          go test ./...
+          go build -o arithmetic_go .
+
       - name: Build Range coder Go
         run: |
           cd range/go
           go vet ./...
-          go build ./...
+          go test ./...
+          go build -o rangecoder_go ./cmd
 
       - name: Build RLE Go
         run: |
@@ -106,13 +113,11 @@ jobs:
 
       - name: Check Rust formatting
         run: |
-          # Check formatting for standalone Rust files
-          for file in huffman/rust/main.rs rle/rust/main.rs; do
+          for file in huffman/rust/main.rs arithmetic/rust/main.rs rle/rust/main.rs; do
             if [ -f "$file" ]; then
               rustfmt --check "$file" || exit 1
             fi
           done
-          # Check formatting for Cargo projects
           if [ -f "range/rust/Cargo.toml" ]; then
             cd range/rust && cargo fmt --check
           fi
@@ -123,6 +128,13 @@ jobs:
           rustc -O main.rs -o huffman_rust
           rustc --test main.rs -o huffman_rust_test
           ./huffman_rust_test
+
+      - name: Build Arithmetic Rust
+        run: |
+          cd arithmetic/rust
+          rustc -O main.rs -o arithmetic_rust
+          rustc --test main.rs -o arithmetic_rust_test
+          ./arithmetic_rust_test
 
       - name: Build and check Range coder Rust
         run: |
@@ -138,7 +150,7 @@ jobs:
           rustc --test main.rs -o rle_rust_test
           ./rle_rust_test
 
-  # Verify encode/decode correctness
+  # Verify encode/decode correctness across languages
   test-correctness:
     name: Test Correctness
     runs-on: ubuntu-latest
@@ -171,105 +183,135 @@ jobs:
           cd arithmetic/cpp && g++ -std=c++17 -O2 main.cpp -o arithmetic_cpp && cd ../..
           cd range/cpp && g++ -std=c++17 -O2 main.cpp -o rangecoder_cpp && cd ../..
           cd rle/cpp && g++ -std=c++17 -O2 main.cpp -o rle_cpp && cd ../..
-          
+
           # Go
           cd huffman/go && go build -o huffman_go . && cd ../..
+          cd arithmetic/go && go build -o arithmetic_go . && cd ../..
+          cd range/go && go build -o rangecoder_go ./cmd && cd ../..
           cd rle/go && go build -o rle_go . && cd ../..
-          
+
           # Rust
           cd huffman/rust && rustc -O main.rs -o huffman_rust && cd ../..
+          cd arithmetic/rust && rustc -O main.rs -o arithmetic_rust && cd ../..
+          cd range/rust && cargo build --bin rangecoder --release && cd ../..
           cd rle/rust && rustc -O main.rs -o rle_rust && cd ../..
 
       - name: Test Huffman correctness
         run: |
           TEST_FILE="tests/data/random_1MiB.bin"
-          
+
           echo "Testing Huffman C++..."
           ./huffman/cpp/huffman_cpp encode "$TEST_FILE" /tmp/huf_cpp.enc
           ./huffman/cpp/huffman_cpp decode /tmp/huf_cpp.enc /tmp/huf_cpp.dec
           diff "$TEST_FILE" /tmp/huf_cpp.dec
-          
+
           echo "Testing Huffman Go..."
           ./huffman/go/huffman_go encode "$TEST_FILE" /tmp/huf_go.enc
           ./huffman/go/huffman_go decode /tmp/huf_go.enc /tmp/huf_go.dec
           diff "$TEST_FILE" /tmp/huf_go.dec
-          
+
           echo "Testing Huffman Rust..."
           ./huffman/rust/huffman_rust encode "$TEST_FILE" /tmp/huf_rust.enc
           ./huffman/rust/huffman_rust decode /tmp/huf_rust.enc /tmp/huf_rust.dec
           diff "$TEST_FILE" /tmp/huf_rust.dec
-          
-          echo "Testing cross-language compatibility (C++ encode -> Go decode)..."
-          ./huffman/go/huffman_go decode /tmp/huf_cpp.enc /tmp/huf_cross.dec
-          diff "$TEST_FILE" /tmp/huf_cross.dec
-          
-          echo "Huffman tests passed!"
 
-      - name: Test RLE correctness
-        run: |
-          TEST_FILE="tests/data/repetitive_10MiB.bin"
-          
-          echo "Testing RLE C++..."
-          ./rle/cpp/rle_cpp encode "$TEST_FILE" /tmp/rle_cpp.enc
-          ./rle/cpp/rle_cpp decode /tmp/rle_cpp.enc /tmp/rle_cpp.dec
-          diff "$TEST_FILE" /tmp/rle_cpp.dec
-          
-          echo "Testing RLE Go..."
-          ./rle/go/rle_go encode "$TEST_FILE" /tmp/rle_go.enc
-          ./rle/go/rle_go decode /tmp/rle_go.enc /tmp/rle_go.dec
-          diff "$TEST_FILE" /tmp/rle_go.dec
-          
-          echo "Testing RLE Rust..."
-          ./rle/rust/rle_rust encode "$TEST_FILE" /tmp/rle_rust.enc
-          ./rle/rust/rle_rust decode /tmp/rle_rust.enc /tmp/rle_rust.dec
-          diff "$TEST_FILE" /tmp/rle_rust.dec
-          
-          echo "Testing cross-language compatibility (C++ encode -> Rust decode)..."
-          ./rle/rust/rle_rust decode /tmp/rle_cpp.enc /tmp/rle_cross.dec
-          diff "$TEST_FILE" /tmp/rle_cross.dec
-          
-          echo "RLE tests passed!"
+          echo "Testing cross-language (C++ encode -> Go decode)..."
+          ./huffman/go/huffman_go decode /tmp/huf_cpp.enc /tmp/huf_cross_go.dec
+          diff "$TEST_FILE" /tmp/huf_cross_go.dec
+
+          echo "Testing cross-language (C++ encode -> Rust decode)..."
+          ./huffman/rust/huffman_rust decode /tmp/huf_cpp.enc /tmp/huf_cross_rust.dec
+          diff "$TEST_FILE" /tmp/huf_cross_rust.dec
+
+          echo "Huffman tests passed!"
 
       - name: Test Arithmetic coding correctness
         run: |
           TEST_FILE="tests/data/random_1MiB.bin"
-          
+
           echo "Testing Arithmetic C++..."
-          ./arithmetic/cpp/arithmetic_cpp encode "$TEST_FILE" /tmp/arith.enc
-          ./arithmetic/cpp/arithmetic_cpp decode /tmp/arith.enc /tmp/arith.dec
-          diff "$TEST_FILE" /tmp/arith.dec
-          
+          ./arithmetic/cpp/arithmetic_cpp encode "$TEST_FILE" /tmp/arith_cpp.enc
+          ./arithmetic/cpp/arithmetic_cpp decode /tmp/arith_cpp.enc /tmp/arith_cpp.dec
+          diff "$TEST_FILE" /tmp/arith_cpp.dec
+
+          echo "Testing Arithmetic Go..."
+          ./arithmetic/go/arithmetic_go encode "$TEST_FILE" /tmp/arith_go.enc
+          ./arithmetic/go/arithmetic_go decode /tmp/arith_go.enc /tmp/arith_go.dec
+          diff "$TEST_FILE" /tmp/arith_go.dec
+
+          echo "Testing Arithmetic Rust..."
+          ./arithmetic/rust/arithmetic_rust encode "$TEST_FILE" /tmp/arith_rust.enc
+          ./arithmetic/rust/arithmetic_rust decode /tmp/arith_rust.enc /tmp/arith_rust.dec
+          diff "$TEST_FILE" /tmp/arith_rust.dec
+
+          echo "Testing cross-language (C++ encode -> Go decode)..."
+          ./arithmetic/go/arithmetic_go decode /tmp/arith_cpp.enc /tmp/arith_cross_go.dec
+          diff "$TEST_FILE" /tmp/arith_cross_go.dec
+
+          echo "Testing cross-language (C++ encode -> Rust decode)..."
+          ./arithmetic/rust/arithmetic_rust decode /tmp/arith_cpp.enc /tmp/arith_cross_rust.dec
+          diff "$TEST_FILE" /tmp/arith_cross_rust.dec
+
           echo "Arithmetic tests passed!"
 
-      - name: Test Range coder C++ correctness
+      - name: Test Range coder correctness
         run: |
           TEST_FILE="tests/data/random_1MiB.bin"
-          
+          RANGE_RUST="./range/rust/target/release/rangecoder"
+
           echo "Testing Range coder C++..."
           ./range/cpp/rangecoder_cpp encode "$TEST_FILE" /tmp/range_cpp.enc
           ./range/cpp/rangecoder_cpp decode /tmp/range_cpp.enc /tmp/range_cpp.dec
           diff "$TEST_FILE" /tmp/range_cpp.dec
-          
-          echo "Range coder C++ tests passed!"
 
-  # Run Go tests for Range coder
-  test-range-go:
-    name: Test Range coder Go
-    runs-on: ubuntu-latest
+          echo "Testing Range coder Go..."
+          ./range/go/rangecoder_go encode "$TEST_FILE" /tmp/range_go.enc
+          ./range/go/rangecoder_go decode /tmp/range_go.enc /tmp/range_go.dec
+          diff "$TEST_FILE" /tmp/range_go.dec
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+          echo "Testing Range coder Rust..."
+          $RANGE_RUST encode "$TEST_FILE" /tmp/range_rust.enc
+          $RANGE_RUST decode /tmp/range_rust.enc /tmp/range_rust.dec
+          diff "$TEST_FILE" /tmp/range_rust.dec
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.21'
+          echo "Testing cross-language (C++ encode -> Go decode)..."
+          ./range/go/rangecoder_go decode /tmp/range_cpp.enc /tmp/range_cross_go.dec
+          diff "$TEST_FILE" /tmp/range_cross_go.dec
 
-      - name: Run Range coder Go tests
+          echo "Testing cross-language (C++ encode -> Rust decode)..."
+          $RANGE_RUST decode /tmp/range_cpp.enc /tmp/range_cross_rust.dec
+          diff "$TEST_FILE" /tmp/range_cross_rust.dec
+
+          echo "Range coder tests passed!"
+
+      - name: Test RLE correctness
         run: |
-          cd range/go
-          go test -v ./...
+          TEST_FILE="tests/data/repetitive_10MiB.bin"
+
+          echo "Testing RLE C++..."
+          ./rle/cpp/rle_cpp encode "$TEST_FILE" /tmp/rle_cpp.enc
+          ./rle/cpp/rle_cpp decode /tmp/rle_cpp.enc /tmp/rle_cpp.dec
+          diff "$TEST_FILE" /tmp/rle_cpp.dec
+
+          echo "Testing RLE Go..."
+          ./rle/go/rle_go encode "$TEST_FILE" /tmp/rle_go.enc
+          ./rle/go/rle_go decode /tmp/rle_go.enc /tmp/rle_go.dec
+          diff "$TEST_FILE" /tmp/rle_go.dec
+
+          echo "Testing RLE Rust..."
+          ./rle/rust/rle_rust encode "$TEST_FILE" /tmp/rle_rust.enc
+          ./rle/rust/rle_rust decode /tmp/rle_rust.enc /tmp/rle_rust.dec
+          diff "$TEST_FILE" /tmp/rle_rust.dec
+
+          echo "Testing cross-language (C++ encode -> Go decode)..."
+          ./rle/go/rle_go decode /tmp/rle_cpp.enc /tmp/rle_cross_go.dec
+          diff "$TEST_FILE" /tmp/rle_cross_go.dec
+
+          echo "Testing cross-language (C++ encode -> Rust decode)..."
+          ./rle/rust/rle_rust decode /tmp/rle_cpp.enc /tmp/rle_cross_rust.dec
+          diff "$TEST_FILE" /tmp/rle_cross_rust.dec
+
+          echo "RLE tests passed!"
 
   # Check required files exist
   check-files:
@@ -294,7 +336,7 @@ jobs:
             ".github/ISSUE_TEMPLATE/feature_request.md"
             ".github/PULL_REQUEST_TEMPLATE.md"
           )
-          
+
           missing=0
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then
@@ -304,12 +346,12 @@ jobs:
               echo "✅ Found: $file"
             fi
           done
-          
+
           if [ $missing -eq 1 ]; then
             echo ""
             echo "Some required files are missing!"
             exit 1
           fi
-          
+
           echo ""
           echo "All required files present!"

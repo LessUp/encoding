@@ -5,7 +5,7 @@ import time
 import subprocess
 from pathlib import Path
 
-# Arithmetic 跨语言 benchmark 脚本
+# Range coder 跨语言 benchmark 脚本
 # - 编译 C++, Go, Rust 三种实现
 # - 在指定输入文件上执行 encode/decode
 # - 校验解码结果与原始输入是否一致
@@ -43,9 +43,12 @@ def ensure_tmp():
 
 def compile_all():
     times = {}
-    times["cpp_build"] = run(["g++", "-std=c++17", "-O2", "main.cpp", "-o", "arithmetic_cpp"], CPP_DIR)
-    times["go_build"] = run(["go", "build", "-o", "arithmetic_go", "."], GO_DIR)
-    times["rust_build"] = run(["rustc", "-O", "main.rs", "-o", "arithmetic_rust"], RUST_DIR)
+    times["cpp_build"] = run(["g++", "-std=c++17", "-O2", "main.cpp", "-o", "rangecoder_cpp"], CPP_DIR)
+    times["go_build"] = run(["go", "build", "-o", "rangecoder_go", "./cmd"], GO_DIR)
+    times["rust_build"] = run(
+        ["cargo", "build", "--bin", "rangecoder", "--release"],
+        RUST_DIR,
+    )
     return times
 
 
@@ -85,15 +88,15 @@ def main():
     build_times = compile_all()
     original_size = input_path.stat().st_size
 
-    cpp_exe = CPP_DIR / "arithmetic_cpp"
-    go_exe = GO_DIR / "arithmetic_go"
-    rust_exe = RUST_DIR / "arithmetic_rust"
+    cpp_exe = CPP_DIR / "rangecoder_cpp"
+    go_exe = GO_DIR / "rangecoder_go"
+    rust_exe = RUST_DIR / "target" / "release" / "rangecoder"
 
-    cpp_enc = TMP_DIR / "cpp.aenc"
+    cpp_enc = TMP_DIR / "cpp.rcnc"
     cpp_dec = TMP_DIR / "cpp.out"
-    go_enc = TMP_DIR / "go.aenc"
+    go_enc = TMP_DIR / "go.rcnc"
     go_dec = TMP_DIR / "go.out"
-    rust_enc = TMP_DIR / "rust.aenc"
+    rust_enc = TMP_DIR / "rust.rcnc"
     rust_dec = TMP_DIR / "rust.out"
 
     results = []

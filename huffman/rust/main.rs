@@ -357,7 +357,7 @@ fn decompress_file(input_path: &str, output_path: &str) -> io::Result<()> {
             writer.write_all(&[node_ref.symbol as u8])?;
             node_ref = &root;
         }
-        if bit_reader.eof() && std::ptr::eq(node_ref, &root) {
+        if bit_reader.eof() && std::ptr::eq(node_ref, &*root) {
             break;
         }
     }

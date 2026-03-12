@@ -78,7 +78,7 @@ fn build_tree(freq: &[u32]) -> Box<Node> {
         let item = heap.pop().unwrap();
         let only = item.node;
         let parent = Box::new(Node {
-            symbol: 0,
+            symbol: only.symbol,
             freq: only.freq,
             left: Some(only),
             right: None,
@@ -94,7 +94,7 @@ fn build_tree(freq: &[u32]) -> Box<Node> {
         let b = heap.pop().unwrap().node;
         let freq_sum = a.freq + b.freq;
         let parent = Box::new(Node {
-            symbol: 0,
+            symbol: a.symbol.min(b.symbol),
             freq: freq_sum,
             left: Some(a),
             right: Some(b),

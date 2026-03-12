@@ -70,14 +70,18 @@ func buildTree(freq []uint32) *Node {
 	}
 	if h.Len() == 1 {
 		only := heap.Pop(h).(*Node)
-		parent := &Node{symbol: 0, freq: only.freq, left: only, right: nil}
+		parent := &Node{symbol: only.symbol, freq: only.freq, left: only, right: nil}
 		heap.Push(h, parent)
 	}
 	for h.Len() > 1 {
 		a := heap.Pop(h).(*Node)
 		b := heap.Pop(h).(*Node)
+		minSymbol := a.symbol
+		if b.symbol < minSymbol {
+			minSymbol = b.symbol
+		}
 		parent := &Node{
-			symbol: 0,
+			symbol: minSymbol,
 			freq:   a.freq + b.freq,
 			left:   a,
 			right:  b,

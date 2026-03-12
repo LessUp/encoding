@@ -111,7 +111,7 @@ static Node* build_tree(const std::vector<uint32_t>& freq) {
         Node* only = pq.top();
         pq.pop();
         Node* parent = new Node;
-        parent->symbol = 0;
+        parent->symbol = only->symbol;
         parent->freq = only->freq;
         parent->left = only;
         parent->right = nullptr;
@@ -123,7 +123,7 @@ static Node* build_tree(const std::vector<uint32_t>& freq) {
         Node* b = pq.top();
         pq.pop();
         Node* parent = new Node;
-        parent->symbol = 0;
+        parent->symbol = a->symbol < b->symbol ? a->symbol : b->symbol;
         parent->freq = a->freq + b->freq;
         parent->left = a;
         parent->right = b;

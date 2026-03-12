@@ -18,7 +18,7 @@ impl fmt::Display for RangeError {
 impl Error for RangeError {}
 
 fn scale_frequencies(freq: &mut [u32]) {
-    let mut total: u64 = freq.iter().map(|&f| f as u64).sum();
+    let total: u64 = freq.iter().map(|&f| f as u64).sum();
     if total == 0 {
         for f in freq.iter_mut() {
             *f = 1;

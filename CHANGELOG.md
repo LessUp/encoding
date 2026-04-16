@@ -1,110 +1,184 @@
-# Changelog | 变更日志
+# Changelog
 
 All notable changes to this project will be documented in this file.
-
-本文件记录本项目的所有重要变更。
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
-本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
-
 ## [Unreleased]
 
-### Added | 新增
-- VitePress SEO: Open Graph / Twitter Card meta tags, sitemap, cleanUrls
-- Docs landing page: feature cards with anchor links, richer hero tagline
-- Docs algorithms page: complexity analysis table, Huffman/Arithmetic comparison, Range Coder vs Arithmetic differences
-- Docs getting-started: code-group tabs, Makefile command table, structured environment requirements
-- Docs project-structure: CI/CD table, file format table, enhanced directory tree
-- Site favicon (logo.svg)
+### Added
+
+#### Documentation
+
+- **Internationalization (i18n)**: Complete bilingual documentation site (English & Chinese)
+  - New directory structure: `docs/en/` and `docs/zh/`
+  - VitePress configuration with locale switcher
+  - Full translations for all guide pages
+- Enhanced README with modern badges and improved structure
+- Professional changelog reorganization with detailed categorization
+
+#### Algorithms & Implementations
+
 - Arithmetic coding Go implementation with full test suite
 - Arithmetic coding Rust implementation with full test suite
 - Range coder Go CLI (`range/go/cmd/main.go`) for cross-language testing
 - Range coder Rust CLI (`range/rust/src/bin/rangecoder.rs`) for cross-language testing
-- Cross-language benchmark script for Arithmetic coding (`arithmetic/benchmark/bench.py`)
-- Cross-language benchmark script for Range coder (`range/benchmark/bench.py`)
-- CI cross-language correctness tests for Arithmetic and Range coder (all 3 languages)
 
-### Changed | 变更
-- Pages workflow: sparse-checkout (skip algorithm source), Node 20→22, package-lock.json path trigger
-- VitePress sidebar restructured into "入门" + "算法" groups, nav added "相关链接" dropdown
-- README.md: fixed dead doc links (algorithms, benchmarks → guide/ paths)
-- Upgraded Arithmetic benchmark from C++-only to cross-language (C++, Go, Rust)
-- Overhauled Makefile with complete build/test/clean targets for all algorithms and languages
-- Updated CI workflow: full build, test, and cross-language verification for all 4 algorithms × 3 languages
+#### Infrastructure
+
+- Cross-language benchmark scripts for Arithmetic coding and Range coder
+- CI cross-language correctness tests for all 4 algorithms × 3 languages
+- Input size validation (4 GiB max) to prevent frequency overflow attacks
+- Output size validation (1 GiB max) to prevent decompression bombs
+- RAII/smart pointers for memory management in C++ Huffman implementation
+- `-Werror` flag in Makefile for C++ builds to catch all warnings
+
+### Changed
+
+#### Documentation Site
+
+- VitePress sidebar restructured into logical groups (Overview, Guide, Reference)
+- README.md simplified to repository entry point with links to docs site
+- Updated site metadata and SEO optimization (Open Graph, Twitter Cards)
+
+#### Build & CI
+
+- Pages workflow: sparse-checkout optimization, Node 20→22, path-based triggers
+- CI workflow: full build, test, and cross-language verification matrix
+- Makefile: complete build/test/clean targets for all algorithms and languages
+- Arithmetic benchmark upgraded from C++-only to cross-language (C++, Go, Rust)
+
+#### Code Quality
+
+- All error messages standardized to English across all implementations
+- All Chinese comments translated to English for consistency
 - Updated `go.work` to include `arithmetic/go` module
 - Updated `range/rust/Cargo.toml` to include `rangecoder` CLI binary
-- Updated `.gitignore` for new binaries and file extensions
-- Updated `run_all_bench.py` to use unified cross-language benchmark scripts
-- Updated README: algorithm table, project structure, Go version badge (1.21+), roadmap
 
-### Fixed | 修复
-- README badge URL: `docs.yml` → `pages.yml` (both EN & ZH READMEs)
-- README algorithm table: "LZ77" → "Range Coder" (matched actual project directory)
-- README project structure: `lz77/` → `range/`
+### Fixed
+
+- README badge URL: `docs.yml` → `pages.yml`
+- README algorithm table: corrected "LZ77" → "Range Coder"
+- README project structure: corrected `lz77/` → `range/`
 - `.gitignore`: removed bare `Makefile` pattern that could shadow root Makefile
-- Fixed Makefile `build-range` target (was running `go test` instead of building CLI)
-- Fixed Makefile `clean` target (replaced fragile Python one-liner with proper `rm` commands)
+- Makefile `build-range` target: fixed incorrect `go test` call
+- Makefile `clean` target: replaced fragile Python one-liner with proper `rm` commands
+- Huffman cross-language compatibility: unified tree building tie-breaking across C++, Go, Rust
+- CI Python setup: removed invalid `cache: pip` option
+- CI Range coder tests: using 100KB test file to work around decode performance issue
+
+### Security
+
+- Added input size limits to prevent frequency overflow attacks
+- Added output size limits to prevent decompression bomb attacks
+- All implementations now validate file sizes before processing
+
+---
 
 ## [1.0.0] - 2026-01-07
 
-### Added | 新增
+### Added
 
-#### Algorithms | 算法
-- Huffman encoding implementation in C++, Go, and Rust
-- Arithmetic coding implementation in C++
-- Range coder implementation in C++, Go, and Rust
-- Run-Length Encoding (RLE) implementation in C++, Go, and Rust
+#### Core Algorithms
 
-#### Features | 功能
+- **Huffman Coding**: Implementation in C++, Go, and Rust
+  - Prefix-code based lossless compression
+  - Cross-language file format compatibility
+  - Benchmark suite
+
+- **Arithmetic Coding**: Implementation in C++
+  - Interval subdivision based compression
+  - Near-optimal compression efficiency
+
+- **Range Coder**: Implementation in C++, Go, and Rust
+  - Integer-based arithmetic coding equivalent
+  - Library API for Go and Rust
+  - CLI tools for all languages
+
+- **Run-Length Encoding (RLE)**: Implementation in C++, Go, and Rust
+  - Simple (count, value) pair encoding
+  - Optimized for repetitive data
+
+#### Features
+
 - Unified CLI interface across all implementations (`encode`/`decode` commands)
 - Cross-language file format compatibility
 - Benchmark scripts for performance comparison
-- Test data generation scripts
+- Test data generation scripts (Python)
 
-#### Documentation | 文档
+#### Documentation
+
 - Comprehensive README with bilingual (Chinese/English) content
-- Algorithm comparison table
-- Quick start guide
+- Algorithm comparison table with complexity analysis
+- Quick start guide with build instructions
 - Project structure documentation
 
-#### Open Source Infrastructure | 开源基础设施
+#### Open Source Infrastructure
+
 - MIT License
-- Contributing guidelines (CONTRIBUTING.md)
-- Code of Conduct (CODE_OF_CONDUCT.md)
-- Security policy (SECURITY.md)
+- Contributing guidelines (CONTRIBUTING.md) - bilingual
+- Code of Conduct (CODE_OF_CONDUCT.md) - bilingual
+- Security policy (SECURITY.md) - bilingual
 - GitHub Issue templates (bug report, feature request)
 - GitHub Pull Request template
-- GitHub Actions CI/CD pipeline
+
+#### CI/CD Pipeline
+
+- GitHub Actions CI workflow
   - Multi-platform C++ builds (Ubuntu, macOS)
   - Go build and lint checks
   - Rust build and clippy checks
   - Encode/decode correctness verification
   - Required files check
+- GitHub Actions Pages workflow for documentation deployment
 
-### Technical Details | 技术细节
+### Technical Specifications
 
-#### File Formats | 文件格式
-- Huffman: Magic header `HFMN`, frequency table, bit-encoded data
-- RLE: `(count, value)` pairs with 4-byte little-endian count
+#### File Formats
 
-#### Build Requirements | 构建要求
-- C++17 compatible compiler
-- Go 1.21+
-- Rust 1.70+
-- Python 3.8+ (for scripts)
+| Algorithm | Magic | Header | Data |
+|-----------|-------|--------|------|
+| Huffman | `HFMN` | Frequency table (257×4 bytes) | Bit stream |
+| Arithmetic | `AENC` | Frequency table (257×4 bytes) | Bit stream |
+| Range Coder | `RCNC` | Frequency table (257×4 bytes) | Byte stream |
+| RLE | None | None | (count, value) pairs |
+
+#### Build Requirements
+
+| Language | Version | Compiler/Tool |
+|----------|---------|---------------|
+| C++ | C++17 | g++ 9+ or clang++ 10+ |
+| Go | 1.21+ | go 1.21+ |
+| Rust | 1.70+ | rustc 1.70+ |
+| Python | 3.8+ | python3 3.8+ |
 
 ---
 
-## Version History Summary | 版本历史摘要
+## Version History Summary
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.0.0 | 2026-01-07 | Initial release with 4 algorithms, 3 languages, full open source setup |
+| [Unreleased] | - | Documentation i18n, security improvements, complete test coverage |
+| [1.0.0] | 2026-01-07 | Initial release with 4 algorithms, 3 languages, full open source setup |
 
 ---
 
+## Release Comparison
+
 [Unreleased]: https://github.com/LessUp/encoding/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/LessUp/encoding/releases/tag/v1.0.0
+
+---
+
+## Contributing
+
+When adding changes to this changelog, please follow the categorization:
+
+- `Added` - New features
+- `Changed` - Changes in existing functionality
+- `Deprecated` - Soon-to-be removed features
+- `Removed` - Now removed features
+- `Fixed` - Bug fixes
+- `Security` - Security-related changes
+- `Performance` - Performance improvements

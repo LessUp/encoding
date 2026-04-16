@@ -1,47 +1,131 @@
-# Encoding —— 编码算法集合
+# Encoding
 
-[![CI](https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/ci.yml)
-[![Deploy Docs](https://github.com/LessUp/encoding/actions/workflows/pages.yml/badge.svg)](https://github.com/LessUp/encoding/actions/workflows/pages.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![C++](https://img.shields.io/badge/C++-17-blue.svg)
-![Go](https://img.shields.io/badge/Go-1.21+-00ADD8.svg)
-![Rust](https://img.shields.io/badge/Rust-1.70+-orange.svg)
+<p align="center">
+  <img src="docs/public/logo.svg" width="120" alt="Encoding Logo">
+</p>
 
-[English](README.md) | 简体中文 | [文档站](https://lessup.github.io/encoding/)
+<p align="center">
+  <a href="https://github.com/LessUp/encoding/actions/workflows/ci.yml">
+    <img src="https://github.com/LessUp/encoding/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://github.com/LessUp/encoding/actions/workflows/pages.yml">
+    <img src="https://github.com/LessUp/encoding/actions/workflows/pages.yml/badge.svg" alt="文档">
+  </a>
+  <a href="https://github.com/LessUp/encoding/releases">
+    <img src="https://img.shields.io/github/v/release/LessUp/encoding?include_prereleases" alt="发布版本">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="许可证: MIT">
+  </a>
+</p>
 
-Encoding 是一个面向学习、实现对比与跨语言验证的经典压缩算法集合，使用 C++17、Go 和 Rust 提供对应实现。
+<p align="center">
+  <img src="https://img.shields.io/badge/C++-17-blue.svg" alt="C++17">
+  <img src="https://img.shields.io/badge/Go-1.21+-00ADD8.svg" alt="Go 1.21+">
+  <img src="https://img.shields.io/badge/Rust-1.70+-orange.svg" alt="Rust 1.70+">
+  <img src="https://img.shields.io/badge/Python-3.8+-3776AB.svg" alt="Python 3.8+">
+</p>
 
-## 仓库入口
+<p align="center">
+  <a href="README.md">English</a> | <b>简体中文</b> | <a href="https://lessup.github.io/encoding/">文档站点</a>
+</p>
 
-- 覆盖 Huffman、算术编码、区间编码、RLE 四类经典算法
-- 每种算法同时提供 C++17、Go、Rust 三套实现
-- 统一 CLI 约定与二进制格式，便于跨语言互相编码/解码验证
-- 详细使用说明、算法导读和目录结构统一放在文档站维护
+---
 
-## 快速开始
+## 🚀 快速开始
 
 ```bash
+# 克隆仓库
+git clone https://github.com/LessUp/encoding.git
+cd encoding
+
+# 构建所有实现
 make build
+
+# 运行测试
 make test
+
+# 运行基准测试
 make bench
 ```
 
-如果你想先从单个算法开始：
+## ✨ 特性
+
+- **4 种经典算法**：Huffman、算术编码、区间编码和 RLE
+- **3 种语言**：C++17、Go 1.21+、Rust 1.70+
+- **跨语言兼容**：所有实现使用相同的二进制格式
+- **面向学习**：文档侧重算法原理和对比
+- **生产就绪**：完整的 CI/CD 与自动化测试验证
+
+## 📊 算法对比
+
+| 算法 | 压缩率 | 速度 | 复杂度 | 适用场景 |
+|------|--------|------|--------|----------|
+| Huffman | 中等 | 快 | O(n log σ) | 通用场景 |
+| 算术编码 | 高 | 中等 | O(n) | 最大压缩 |
+| 区间编码 | 高 | 快 | O(n) | 平衡性能 |
+| RLE | 可变 | 极快 | O(n) | 重复数据 |
+
+## 📖 文档
+
+| 资源 | 描述 | 链接 |
+|------|------|------|
+| **文档站点** | 完整的中英文双语文档 | [lessup.github.io/encoding](https://lessup.github.io/encoding/) |
+| **快速开始** | 环境配置、构建和基本用法 | [指南 →](https://lessup.github.io/encoding/zh/guide/getting-started) |
+| **算法详解** | 算法说明和对比 | [指南 →](https://lessup.github.io/encoding/zh/guide/algorithms) |
+| **项目结构** | 目录结构和约定 | [指南 →](https://lessup.github.io/encoding/zh/guide/project-structure) |
+| **更新日志** | 版本历史和发布说明 | [查看 →](CHANGELOG.md) |
+
+## 💡 使用示例
 
 ```bash
-cd huffman/cpp
-g++ -std=c++17 -O2 main.cpp -o huffman_cpp
-./huffman_cpp encode input.bin output.huf
-./huffman_cpp decode output.huf restored.bin
+# 使用 Huffman (C++) 编码
+./huffman/cpp/huffman_cpp encode input.txt output.huf
+
+# 使用另一种语言 (Go) 解码
+./huffman/go/huffman_go decode output.huf restored.txt
+
+# 验证正确性
+diff input.txt restored.txt  # 无输出 = 相同
 ```
 
-## 接下来读什么
+## 🛠️ 构建选项
 
-- [文档首页](https://lessup.github.io/encoding/)
-- [快速开始](https://lessup.github.io/encoding/guide/getting-started)
-- [算法详解](https://lessup.github.io/encoding/guide/algorithms)
-- [项目结构](https://lessup.github.io/encoding/guide/project-structure)
+| 命令 | 描述 |
+|------|------|
+| `make build` | 构建所有实现 |
+| `make build-huffman` | 仅构建 Huffman |
+| `make build-arithmetic` | 仅构建算术编码 |
+| `make build-range` | 仅构建区间编码 |
+| `make build-rle` | 仅构建 RLE |
+| `make test` | 运行所有测试 |
+| `make bench` | 运行性能基准测试 |
+| `make clean` | 清理构建产物 |
 
-## 许可证
+## 🤝 参与贡献
 
-MIT License。
+我们欢迎贡献！请阅读我们的[贡献指南](CONTRIBUTING.md)了解：
+
+- C++、Go 和 Rust 的代码风格指南
+- 测试要求
+- Pull Request 流程
+
+## 🙏 致谢
+
+本项目受压缩算法教育资源的启发，旨在提供：
+
+- 用于学习的清晰、可读实现
+- 公平的跨语言性能对比
+- 通过广泛测试验证的正确实现
+
+## 📄 许可证
+
+本项目基于 [MIT 许可证](LICENSE) 开源。
+
+版权所有 © 2025-2026 LessUp
+
+---
+
+<p align="center">
+  <sub>用 ❤️ 为开源社区构建</sub>
+</p>

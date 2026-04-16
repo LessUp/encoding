@@ -121,7 +121,10 @@ impl<W: Write> ArithmeticEncoder<W> {
     fn encode_symbol(&mut self, symbol: u32, cumulative: &[u32]) -> io::Result<()> {
         let range = self.high - self.low + 1;
         let total = *cumulative.last().ok_or_else(|| {
-            io::Error::new(io::ErrorKind::InvalidData, "empty cumulative frequency table")
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                "empty cumulative frequency table",
+            )
         })? as u64;
         let sym_low = cumulative[symbol as usize] as u64;
         let sym_high = cumulative[symbol as usize + 1] as u64;
@@ -198,7 +201,10 @@ impl<R: Read> ArithmeticDecoder<R> {
     fn decode_symbol(&mut self, cumulative: &[u32]) -> io::Result<u32> {
         let range = self.high - self.low + 1;
         let total = *cumulative.last().ok_or_else(|| {
-            io::Error::new(io::ErrorKind::InvalidData, "empty cumulative frequency table")
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                "empty cumulative frequency table",
+            )
         })? as u64;
         let offset = self.code - self.low;
         let value = ((offset + 1) * total - 1) / range;
@@ -284,8 +290,12 @@ fn scale_frequencies(freq: &mut [u32]) {
 
 fn build_frequencies_from_file(path: &str) -> io::Result<Vec<u32>> {
     let mut freq = vec![0u32; SYMBOL_LIMIT];
-    let file = File::open(path)
-        .map_err(|e| io::Error::new(e.kind(), format!("cannot open input file for reading: {path}: {e}")))?;
+    let file = File::open(path).map_err(|e| {
+        io::Error::new(
+            e.kind(),
+            format!("cannot open input file for reading: {path}: {e}"),
+        )
+    })?;
 
     // Check file size to prevent frequency overflow
     let metadata = file.metadata()?;
@@ -353,9 +363,9 @@ fn read_frequencies<R: Read>(reader: &mut R) -> io::Result<Vec<u32>> {
     let mut freq = vec![0u32; count];
     for f in freq.iter_mut() {
         let mut arr = [0u8; 4];
-        reader
-            .read_exact(&mut arr)
-            .map_err(|e| io::Error::new(e.kind(), format!("failed to read frequency table: {e}")))?;
+        reader.read_exact(&mut arr).map_err(|e| {
+            io::Error::new(e.kind(), format!("failed to read frequency table: {e}"))
+        })?;
         *f = u32::from_le_bytes(arr);
     }
     Ok(freq)

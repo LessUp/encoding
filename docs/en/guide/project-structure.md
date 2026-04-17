@@ -45,7 +45,7 @@ encoding/
 | Language | Version | Build Method | Characteristics |
 |----------|---------|--------------|-----------------|
 | **C++** | C++17 | `g++ -std=c++17 -O2` | Single file, zero dependencies |
-| **Go** | 1.21+ | Go modules (`go.mod`) | Range coder provides library API |
+| **Go** | 1.21+ | Go modules (`go.mod` + `cmd/`) | All implementations provide library API + CLI |
 | **Rust** | 1.70+ | Cargo / `rustc` | Range coder provides library crate |
 
 ## Unified CLI Interface

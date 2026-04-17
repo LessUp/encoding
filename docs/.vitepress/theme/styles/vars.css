@@ -1,1 +1,23 @@
 /* Custom CSS variables for VitePress theme */
+
+:root {
+  --vp-c-brand: #3b82f6;
+  --vp-c-brand-light: #60a5fa;
+  --vp-c-brand-lighter: #93c5fd;
+  --vp-c-brand-dark: #2563eb;
+  --vp-c-brand-darker: #1d4ed8;
+  --vp-c-brand-1: #3b82f6;
+  --vp-c-brand-2: #2563eb;
+  --vp-c-brand-3: #1d4ed8;
+}
+
+.dark {
+  --vp-c-brand: #60a5fa;
+  --vp-c-brand-light: #93c5fd;
+  --vp-c-brand-lighter: #bfdbfe;
+  --vp-c-brand-dark: #3b82f6;
+  --vp-c-brand-darker: #2563eb;
+  --vp-c-brand-1: #60a5fa;
+  --vp-c-brand-2: #3b82f6;
+  --vp-c-brand-3: #2563eb;
+}

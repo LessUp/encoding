@@ -81,7 +81,7 @@ g++ -std=c++17 -O2 main.cpp -o huffman_cpp
 
 ```bash [Go]
 cd algorithms/huffman/go
-go build -o huffman_go .
+go build -o huffman_go ./cmd
 ./huffman_go encode input.bin output.huf
 ./huffman_go decode output.huf restored.bin
 ```

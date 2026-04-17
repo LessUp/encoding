@@ -1,0 +1,106 @@
+# C++ Implementation Reference
+
+All C++ implementations are single-file, zero-dependency programs using C++17.
+
+## Compilation
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -o <binary> main.cpp
+```
+
+### Recommended Flags
+
+| Flag | Purpose |
+|------|---------|
+| `-std=c++17` | Enable C++17 features |
+| `-O2` | Optimization level |
+| `-Wall -Wextra` | Warnings |
+| `-fsanitize=address` | AddressSanitizer (debug builds) |
+| `-fsanitize=undefined` | UBSan (debug builds) |
+
+## Huffman (`algorithms/huffman/cpp/main.cpp`)
+
+### Usage
+
+```bash
+./huffman_cpp encode input.bin output.huf
+./huffman_cpp decode output.huf decoded.bin
+```
+
+### Internal Structure
+
+- `BitWriter` / `BitReader` — bit-level I/O classes
+- `Node` — Huffman tree node with custom deleter
+- `compress_file()` / `decompress_file()` — main encode/decode functions
+
+### File Format
+
+| Offset | Size | Field |
+|--------|------|-------|
+| 0 | 4B | Magic: `HFMN` |
+| 4 | 4B | Frequency table size (always 257) |
+| 8 | 1028B | Frequency table (257 × uint32 LE) |
+| 1036+ | Variable | Encoded bit stream |
+
+---
+
+## Arithmetic (`algorithms/arithmetic/cpp/main.cpp`)
+
+### Usage
+
+```bash
+./arithmetic_cpp encode input.bin output.aenc
+./arithmetic_cpp decode output.aenc decoded.bin
+```
+
+### Key Classes
+
+- `ArithmeticEncoder` — state machine with `low`, `high`, `pendingBits`
+- `ArithmeticDecoder` — decoder with `code` initialization
+
+---
+
+## Range Coder (`algorithms/range/cpp/main.cpp`)
+
+### Usage
+
+```bash
+./rangecoder_cpp encode input.bin output.rcnc
+./rangecoder_cpp decode output.rcnc decoded.bin
+```
+
+### File Format
+
+| Offset | Size | Field |
+|--------|------|-------|
+| 0 | 4B | Magic: `RCNC` |
+| 4 | 4B | Frequency table size |
+| 8 | Variable | Frequency table |
+| ... | Variable | Byte stream (renormalized intervals) |
+
+---
+
+## RLE (`algorithms/rle/cpp/main.cpp`)
+
+### Usage
+
+```bash
+./rle_cpp encode input.bin output.rle
+./rle_cpp decode output.rle decoded.bin
+```
+
+### File Format
+
+Repeated `(count: uint32 LE, value: byte)` pairs.
+
+---
+
+## Common Patterns
+
+| Pattern | Description |
+|---------|-------------|
+| Single file | Each algorithm in one `main.cpp` |
+| Zero dependencies | Only standard library |
+| `#include <...>` | Standard library only |
+| Error handling | `fprintf(stderr, ...)` + `exit(1)` |
+| Memory management | `std::unique_ptr` with custom deleters |

@@ -5,19 +5,32 @@ const sharedSidebar = {
   '/en/': [
     {
       text: 'Overview',
-      items: [{ text: 'Home', link: '/en/' }],
+      items: [
+        { text: 'Home', link: '/en/' },
+        { text: 'Quick Start', link: '/en/guide/getting-started' },
+        { text: 'Algorithms', link: '/en/guide/algorithms' },
+      ],
     },
     {
-      text: 'Guide',
+      text: 'API Reference',
       items: [
-        { text: 'Getting Started', link: '/en/guide/getting-started' },
-        { text: 'Algorithms', link: '/en/guide/algorithms' },
+        { text: 'Go Library', link: '/en/api/go' },
+        { text: 'Rust Crate', link: '/en/api/rust' },
+        { text: 'C++ Header', link: '/en/api/cpp' },
+      ],
+    },
+    {
+      text: 'Benchmarks',
+      items: [
+        { text: 'Performance Results', link: '/en/benchmarks/results' },
+        { text: 'How to Run', link: '/en/benchmarks/how-to-run' },
       ],
     },
     {
       text: 'Reference',
       items: [
         { text: 'Project Structure', link: '/en/guide/project-structure' },
+        { text: 'Contributing', link: '/en/guide/contributing' },
         { text: 'Specs (SSOT)', link: 'https://github.com/LessUp/encoding/tree/master/specs' },
       ],
     },
@@ -25,19 +38,32 @@ const sharedSidebar = {
   '/zh/': [
     {
       text: '概览',
-      items: [{ text: '首页', link: '/zh/' }],
-    },
-    {
-      text: '指南',
       items: [
+        { text: '首页', link: '/zh/' },
         { text: '快速开始', link: '/zh/guide/getting-started' },
         { text: '算法详解', link: '/zh/guide/algorithms' },
+      ],
+    },
+    {
+      text: 'API 参考',
+      items: [
+        { text: 'Go 库', link: '/zh/api/go' },
+        { text: 'Rust 包', link: '/zh/api/rust' },
+        { text: 'C++ 头文件', link: '/zh/api/cpp' },
+      ],
+    },
+    {
+      text: '基准测试',
+      items: [
+        { text: '性能结果', link: '/zh/benchmarks/results' },
+        { text: '如何运行', link: '/zh/benchmarks/how-to-run' },
       ],
     },
     {
       text: '参考',
       items: [
         { text: '项目结构', link: '/zh/guide/project-structure' },
+        { text: '参与贡献', link: '/zh/guide/contributing' },
         { text: '规范文档 (SSOT)', link: 'https://github.com/LessUp/encoding/tree/master/specs' },
       ],
     },
@@ -49,7 +75,9 @@ const sharedNav = (lang: string) => [
   { text: lang === 'zh' ? '概览' : 'Overview', link: lang === 'zh' ? '/zh/' : '/en/' },
   { text: lang === 'zh' ? '快速开始' : 'Get Started', link: lang === 'zh' ? '/zh/guide/getting-started' : '/en/guide/getting-started' },
   { text: lang === 'zh' ? '算法' : 'Algorithms', link: lang === 'zh' ? '/zh/guide/algorithms' : '/en/guide/algorithms' },
-  { text: lang === 'zh' ? '参考' : 'Reference', link: lang === 'zh' ? '/zh/guide/project-structure' : '/en/guide/project-structure' },
+  { text: lang === 'zh' ? 'API' : 'API', link: lang === 'zh' ? '/zh/api/go' : '/en/api/go' },
+  { text: lang === 'zh' ? '性能' : 'Benchmarks', link: lang === 'zh' ? '/zh/benchmarks/results' : '/en/benchmarks/results' },
+  { text: lang === 'zh' ? '贡献' : 'Contributing', link: lang === 'zh' ? '/zh/guide/contributing' : '/en/guide/contributing' },
   { text: 'Changelog', link: 'https://github.com/LessUp/encoding/blob/master/CHANGELOG.md' },
 ]
 
@@ -72,7 +100,7 @@ export default defineConfig({
     ['meta', { property: 'og:title', content: 'Encoding | Compression Algorithms Collection' }],
     ['meta', { property: 'og:description', content: 'Classic compression algorithms in C++, Go, and Rust for learning, comparison and cross-language verification' }],
     ['meta', { property: 'og:url', content: 'https://lessup.github.io/encoding/' }],
-    ['meta', { name: 'twitter:card', content: 'summary' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'Encoding | Compression Algorithms Collection' }],
     ['meta', { name: 'twitter:description', content: 'Classic compression algorithms in C++, Go, and Rust for learning, comparison and cross-language verification' }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/encoding/logo.svg' }],
@@ -159,11 +187,28 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/LessUp/encoding' },
     ],
 
-    // Search (shared)
+    // Search (localized)
     search: {
       provider: 'local',
       options: {
         locales: {
+          root: {
+            translations: {
+              button: {
+                buttonText: 'Search',
+                buttonAriaLabel: 'Search docs',
+              },
+              modal: {
+                noResultsText: 'No results found',
+                resetButtonTitle: 'Reset search',
+                footer: {
+                  selectText: 'select',
+                  navigateText: 'navigate',
+                  closeText: 'close',
+                },
+              },
+            },
+          },
           zh: {
             translations: {
               button: {

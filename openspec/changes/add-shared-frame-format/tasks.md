@@ -1,0 +1,58 @@
+# Tasks: add-shared-frame-format
+
+## Legend
+
+- [ ] not started
+- [x] done
+
+---
+
+## Phase A — Spec & Design Validation
+
+- [ ] A1. Verify magic `0x434B5A4D` does not conflict with other known compression formats (gzip `1f 8b`, zstd `fd 2f b5 28`, LZ4 `04 22 4d 18`).
+- [ ] A2. Confirm xxHash-64 library availability: `github.com/cespare/xxhash` (Go), `xxhash` crate (Rust), and xxhash-cpp (C++). Add to dependency manifests if absent.
+- [ ] A3. Confirm `FLAG_*` bit positions are stable; document rationale for bit 3–15 reserved policy.
+
+## Phase B — Shared Header Library (C++17)
+
+- [ ] B1. Create `algorithms/shared/cpp/include/compresskit/frame.hpp` — `FrameHeader`, `FrameTrailer`, `ExtensionBlock` structs.
+- [ ] B2. Implement `frame_write()` and `frame_read()` in `algorithms/shared/cpp/src/frame.cpp`.
+- [ ] B3. Add unit tests in `algorithms/shared/cpp/tests/test_frame.cpp` covering:
+  - round-trip header write/read
+  - wrong magic → error
+  - unknown flags → error
+  - version != 1 → error
+  - dict extension block
+  - skippable block skip
+
+## Phase C — Shared Header Library (Go)
+
+- [ ] C1. Create `pkg/frame/frame.go` — `Header`, `Trailer`, and extension types.
+- [ ] C2. Implement `WriteHeader`, `ReadHeader`, `WriteTrailer`, `ReadTrailer`.
+- [ ] C3. Add unit tests in `pkg/frame/frame_test.go` with same scenarios as B3.
+
+## Phase D — Shared Header Library (Rust)
+
+- [ ] D1. Create `src/frame/mod.rs` — `FrameHeader`, `FrameTrailer`, and extension types.
+- [ ] D2. Implement `write_header`, `read_header`, `write_trailer`, `read_trailer`.
+- [ ] D3. Add unit tests in `src/frame/tests.rs` with same scenarios as B3.
+
+## Phase E — Algorithm Integration
+
+- [ ] E1. Update Huffman encoder/decoder (all 3 languages) to write/read frame header.
+- [ ] E2. Update Arithmetic encoder/decoder (all 3 languages).
+- [ ] E3. Update Range encoder/decoder (all 3 languages).
+- [ ] E4. Update RLE encoder/decoder (all 3 languages).
+- [ ] E5. Verify `content_size` is written correctly; use `0` when streaming (size unknown at start).
+- [ ] E6. Verify `checksum` is computed over uncompressed content before encoding.
+
+## Phase F — Migration Tooling
+
+- [ ] F1. Implement `compresskit-migrate` CLI sub-command (or script) that reads a legacy (pre-frame) file and re-wraps it with a frame header.
+- [ ] F2. Add a test in the CI pipeline that encodes a file with the migration tool and decodes it successfully.
+
+## Phase G — Documentation
+
+- [ ] G1. Add `docs/en/format/frame.md` with the full frame layout table and field descriptions.
+- [ ] G2. Add `docs/zh/format/frame.md` (Chinese translation).
+- [ ] G3. Update architecture overview to reference the new frame format.

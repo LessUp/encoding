@@ -1,5 +1,22 @@
 package codec
 
+func growBuffer(currentLen int, limit int) int {
+	if currentLen <= 0 {
+		if limit < 1024 {
+			return limit
+		}
+		return 1024
+	}
+	next := currentLen * 2
+	if next < currentLen {
+		return limit
+	}
+	if next > limit {
+		return limit
+	}
+	return next
+}
+
 // EncodeBuffer is a convenience function that encodes input using the streaming API.
 // Equivalent to: new encoder → Process(input) → Finish() → collect output.
 //
@@ -15,13 +32,17 @@ func EncodeBuffer(encoder Encoder, input []byte) ([]byte, error) {
 	outBuf := make([]byte, len(input)*2+2048)
 	var totalWritten int
 
-	// Process all input
-	n, err := encoder.Process(input, outBuf[totalWritten:])
-	if err == ErrBufTooSmall {
-		// Grow buffer and retry
-		outBuf = make([]byte, len(input)*8+4096)
-		encoder.Reset()
+	var n int
+	var err error
+	for {
 		n, err = encoder.Process(input, outBuf[totalWritten:])
+		if err != ErrBufTooSmall {
+			break
+		}
+		if len(outBuf) >= MaxOutputSize {
+			return nil, ErrSizeLimit
+		}
+		outBuf = make([]byte, growBuffer(len(outBuf), MaxOutputSize))
 	}
 	if err != nil {
 		return nil, err
@@ -29,13 +50,17 @@ func EncodeBuffer(encoder Encoder, input []byte) ([]byte, error) {
 	totalWritten += n
 
 	// Finish encoding
-	n, err = encoder.Finish(outBuf[totalWritten:])
-	if err == ErrBufTooSmall {
-		// Grow buffer for finish
-		newBuf := make([]byte, len(outBuf)*2)
+	for {
+		n, err = encoder.Finish(outBuf[totalWritten:])
+		if err != ErrBufTooSmall {
+			break
+		}
+		if len(outBuf) >= MaxOutputSize {
+			return nil, ErrSizeLimit
+		}
+		newBuf := make([]byte, growBuffer(len(outBuf), MaxOutputSize))
 		copy(newBuf, outBuf[:totalWritten])
 		outBuf = newBuf
-		n, err = encoder.Finish(outBuf[totalWritten:])
 	}
 	if err != nil {
 		return nil, err
@@ -55,13 +80,17 @@ func DecodeBuffer(decoder Decoder, input []byte) ([]byte, error) {
 	outBuf := make([]byte, len(input)+1024)
 	var totalWritten int
 
-	// Process all input
-	n, err := decoder.Process(input, outBuf[totalWritten:])
-	if err == ErrBufTooSmall {
-		// Grow buffer and retry
-		outBuf = make([]byte, MaxOutputSize)
-		decoder.Reset()
+	var n int
+	var err error
+	for {
 		n, err = decoder.Process(input, outBuf[totalWritten:])
+		if err != ErrBufTooSmall {
+			break
+		}
+		if len(outBuf) >= MaxOutputSize {
+			return nil, ErrSizeLimit
+		}
+		outBuf = make([]byte, growBuffer(len(outBuf), MaxOutputSize))
 	}
 	if err != nil {
 		return nil, err
@@ -69,16 +98,17 @@ func DecodeBuffer(decoder Decoder, input []byte) ([]byte, error) {
 	totalWritten += n
 
 	// Finish decoding
-	n, err = decoder.Finish(outBuf[totalWritten:])
-	if err == ErrBufTooSmall {
-		// Grow buffer for finish
-		if totalWritten+1024*1024 > MaxOutputSize {
+	for {
+		n, err = decoder.Finish(outBuf[totalWritten:])
+		if err != ErrBufTooSmall {
+			break
+		}
+		if len(outBuf) >= MaxOutputSize {
 			return nil, ErrSizeLimit
 		}
-		newBuf := make([]byte, totalWritten+1024*1024)
+		newBuf := make([]byte, growBuffer(len(outBuf), MaxOutputSize))
 		copy(newBuf, outBuf[:totalWritten])
 		outBuf = newBuf
-		n, err = decoder.Finish(outBuf[totalWritten:])
 	}
 	if err != nil {
 		return nil, err

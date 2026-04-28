@@ -7,6 +7,12 @@
 
 ---
 
+## Phase A0 — Contract-First Test Planning
+
+- [ ] A0.1. Create `tests/streaming_api_contract/contract_cases.md` and write failing tests for process/flush/finish lifecycle.
+- [ ] A0.2. Verify tests fail against current Huffman/Range API surface before introducing shared streaming abstractions.
+- [ ] A0.3. Create `tests/streaming_api_contract/README.md` describing scope, fixture ownership, and the rule that this stage modifies test plans only.
+
 ## Phase A — Spec & Design Review
 
 - [ ] A1. Review design.md lifecycle state machine against all four algorithms (Huffman, AC, RC, RLE) for correctness; update design.md if gaps found.

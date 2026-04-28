@@ -74,7 +74,7 @@ func (e *StreamingEncoder) Finish(out []byte) (int, error) {
 
 	// Encode buffered input using existing implementation
 	var outBuf bytes.Buffer
-	err := Encode(e.inputBuf, &outBuf)
+	err := Encode(bytes.NewReader(e.inputBuf.Bytes()), &outBuf)
 	if err != nil {
 		e.state = codec.StateError
 		return 0, err
@@ -169,7 +169,7 @@ func (d *StreamingDecoder) Finish(out []byte) (int, error) {
 
 	// Decode buffered input using existing implementation
 	var outBuf bytes.Buffer
-	err := Decode(d.inputBuf, &outBuf)
+	err := Decode(bytes.NewReader(d.inputBuf.Bytes()), &outBuf)
 	if err != nil {
 		d.state = codec.StateError
 		// Map errors to codec errors

@@ -179,79 +179,103 @@ func TestLifecycle_ChunkedInput(t *testing.T) {
 
 // TestLifecycle_FlushWithoutFinish tests L4: flush without finish.
 func TestLifecycle_FlushWithoutFinish(t *testing.T) {
-	enc := huffman.NewStreamingEncoder()
-
-	input := []byte("test")
-	outBuf := make([]byte, 4096)
-
-	_, err := enc.Process(input, outBuf)
-	if err != nil {
-		t.Fatalf("Process() error = %v", err)
+	tests := []struct {
+		name       string
+		newEncoder func() codec.Encoder
+	}{
+		{"Huffman", func() codec.Encoder { return huffman.NewStreamingEncoder() }},
+		{"Arithmetic", func() codec.Encoder { return arithmetic.NewStreamingEncoder() }},
+		{"Range", func() codec.Encoder { return rangecoder.NewStreamingEncoder() }},
+		{"RLE", func() codec.Encoder { return rle.NewStreamingEncoder() }},
 	}
 
-	if enc.State() != codec.StateStreaming {
-		t.Errorf("State = %v, want StateStreaming", enc.State())
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			enc := tt.newEncoder()
+			input := []byte("test")
+			outBuf := make([]byte, 4096)
 
-	// Flush
-	_, err = enc.Flush(outBuf)
-	if err != nil {
-		t.Fatalf("Flush() error = %v", err)
-	}
+			_, err := enc.Process(input, outBuf)
+			if err != nil {
+				t.Fatalf("Process() error = %v", err)
+			}
 
-	if enc.State() != codec.StateFlushing {
-		t.Errorf("State after Flush = %v, want StateFlushing", enc.State())
-	}
+			if enc.State() != codec.StateStreaming {
+				t.Errorf("State = %v, want StateStreaming", enc.State())
+			}
 
-	// Process again should transition back to STREAMING
-	_, err = enc.Process([]byte("more"), outBuf)
-	if err != nil {
-		t.Fatalf("Process() after Flush error = %v", err)
-	}
+			_, err = enc.Flush(outBuf)
+			if err != nil {
+				t.Fatalf("Flush() error = %v", err)
+			}
 
-	if enc.State() != codec.StateStreaming {
-		t.Errorf("State after Process = %v, want StateStreaming", enc.State())
+			if enc.State() != codec.StateFlushing {
+				t.Errorf("State after Flush = %v, want StateFlushing", enc.State())
+			}
+
+			_, err = enc.Process([]byte("more"), outBuf)
+			if err != nil {
+				t.Fatalf("Process() after Flush error = %v", err)
+			}
+
+			if enc.State() != codec.StateStreaming {
+				t.Errorf("State after Process = %v, want StateStreaming", enc.State())
+			}
+		})
 	}
 }
 
 // TestLifecycle_FinishAfterMultipleProcess tests L5: finish after multiple process calls.
 func TestLifecycle_FinishAfterMultipleProcess(t *testing.T) {
-	enc := huffman.NewStreamingEncoder()
-	outBuf := make([]byte, 4096)
-
-	_, err := enc.Process([]byte("test1"), outBuf)
-	if err != nil {
-		t.Fatalf("Process(1) error = %v", err)
+	tests := []struct {
+		name       string
+		newEncoder func() codec.Encoder
+	}{
+		{"Huffman", func() codec.Encoder { return huffman.NewStreamingEncoder() }},
+		{"Arithmetic", func() codec.Encoder { return arithmetic.NewStreamingEncoder() }},
+		{"Range", func() codec.Encoder { return rangecoder.NewStreamingEncoder() }},
+		{"RLE", func() codec.Encoder { return rle.NewStreamingEncoder() }},
 	}
 
-	_, err = enc.Process([]byte("test2"), outBuf)
-	if err != nil {
-		t.Fatalf("Process(2) error = %v", err)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			enc := tt.newEncoder()
+			outBuf := make([]byte, 4096)
 
-	_, err = enc.Finish(outBuf)
-	if err != nil {
-		t.Fatalf("Finish() error = %v", err)
-	}
+			_, err := enc.Process([]byte("test1"), outBuf)
+			if err != nil {
+				t.Fatalf("Process(1) error = %v", err)
+			}
 
-	if enc.State() != codec.StateFinished {
-		t.Errorf("State = %v, want StateFinished", enc.State())
-	}
+			_, err = enc.Process([]byte("test2"), outBuf)
+			if err != nil {
+				t.Fatalf("Process(2) error = %v", err)
+			}
 
-	// Subsequent calls should return ERR_INVALID_STATE
-	_, err = enc.Process([]byte("fail"), outBuf)
-	if err != codec.ErrInvalidState {
-		t.Errorf("Process() after Finish error = %v, want ErrInvalidState", err)
-	}
+			_, err = enc.Finish(outBuf)
+			if err != nil {
+				t.Fatalf("Finish() error = %v", err)
+			}
 
-	_, err = enc.Flush(outBuf)
-	if err != codec.ErrInvalidState {
-		t.Errorf("Flush() after Finish error = %v, want ErrInvalidState", err)
-	}
+			if enc.State() != codec.StateFinished {
+				t.Errorf("State = %v, want StateFinished", enc.State())
+			}
 
-	_, err = enc.Finish(outBuf)
-	if err != codec.ErrInvalidState {
-		t.Errorf("Finish() after Finish error = %v, want ErrInvalidState", err)
+			_, err = enc.Process([]byte("fail"), outBuf)
+			if err != codec.ErrInvalidState {
+				t.Errorf("Process() after Finish error = %v, want ErrInvalidState", err)
+			}
+
+			_, err = enc.Flush(outBuf)
+			if err != codec.ErrInvalidState {
+				t.Errorf("Flush() after Finish error = %v, want ErrInvalidState", err)
+			}
+
+			_, err = enc.Finish(outBuf)
+			if err != codec.ErrInvalidState {
+				t.Errorf("Finish() after Finish error = %v, want ErrInvalidState", err)
+			}
+		})
 	}
 }
 
@@ -286,63 +310,97 @@ func TestLifecycle_ResetAfterFinish(t *testing.T) {
 
 // TestLifecycle_ResetAfterError tests L7: reset after error.
 func TestLifecycle_ResetAfterError(t *testing.T) {
-	enc := huffman.NewStreamingEncoder()
-
-	// Create an error by providing a too-small buffer
-	smallBuf := make([]byte, 1)
-	_, err := enc.Process([]byte("test data that will need encoding"), smallBuf)
-	// Process doesn't emit yet for Huffman, so this won't fail. Let's finish.
-	_, err = enc.Finish(smallBuf)
-	if err != codec.ErrBufTooSmall {
-		t.Fatalf("Expected ErrBufTooSmall, got %v", err)
+	tests := []struct {
+		name       string
+		newDecoder func() codec.Decoder
+	}{
+		{"Huffman", func() codec.Decoder { return huffman.NewStreamingDecoder() }},
+		{"Arithmetic", func() codec.Decoder { return arithmetic.NewStreamingDecoder() }},
+		{"Range", func() codec.Decoder { return rangecoder.NewStreamingDecoder() }},
+		{"RLE", func() codec.Decoder { return rle.NewStreamingDecoder() }},
 	}
 
-	// State should still be valid (transactional)
-	// But let's force an error state by simulating
-	// Actually, BUF_TOO_SMALL is transactional, so state unchanged.
-	// Let's test Reset from any state works.
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dec := tt.newDecoder()
+			outBuf := make([]byte, 4096)
 
-	enc.Reset()
-	if enc.State() != codec.StateReady {
-		t.Errorf("State after Reset = %v, want StateReady", enc.State())
+			_, err := dec.Process([]byte("not-a-valid-frame"), outBuf)
+			if err != nil {
+				t.Fatalf("Process() error = %v", err)
+			}
+
+			_, err = dec.Finish(outBuf)
+			if err == nil {
+				t.Fatalf("Finish() expected decode error")
+			}
+
+			if dec.State() != codec.StateError {
+				t.Fatalf("State after error = %v, want StateError", dec.State())
+			}
+
+			dec.Reset()
+			if dec.State() != codec.StateReady {
+				t.Errorf("State after Reset = %v, want StateReady", dec.State())
+			}
+		})
 	}
 }
 
 // TestBuffer_BufTooSmallTransactional tests B1: BUF_TOO_SMALL is transactional.
 func TestBuffer_BufTooSmallTransactional(t *testing.T) {
-	enc := huffman.NewStreamingEncoder()
 	input := []byte("test data for encoding")
-
-	// Process input
-	largeBuf := make([]byte, 4096)
-	_, err := enc.Process(input, largeBuf)
-	if err != nil {
-		t.Fatalf("Process() error = %v", err)
+	tests := []struct {
+		name       string
+		newEncoder func() codec.Encoder
+		newDecoder func() codec.Decoder
+	}{
+		{"Huffman", func() codec.Encoder { return huffman.NewStreamingEncoder() }, func() codec.Decoder { return huffman.NewStreamingDecoder() }},
+		{"Arithmetic", func() codec.Encoder { return arithmetic.NewStreamingEncoder() }, func() codec.Decoder { return arithmetic.NewStreamingDecoder() }},
+		{"Range", func() codec.Encoder { return rangecoder.NewStreamingEncoder() }, func() codec.Decoder { return rangecoder.NewStreamingDecoder() }},
+		{"RLE", func() codec.Encoder { return rle.NewStreamingEncoder() }, func() codec.Decoder { return rle.NewStreamingDecoder() }},
 	}
 
-	stateBefore := enc.State()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			enc := tt.newEncoder()
 
-	// Try to finish with too-small buffer
-	smallBuf := make([]byte, 10)
-	_, err = enc.Finish(smallBuf)
-	if err != codec.ErrBufTooSmall {
-		t.Fatalf("Expected ErrBufTooSmall, got %v", err)
-	}
+			largeBuf := make([]byte, 4096)
+			_, err := enc.Process(input, largeBuf)
+			if err != nil {
+				t.Fatalf("Process() error = %v", err)
+			}
 
-	// State should be unchanged (transactional)
-	stateAfter := enc.State()
-	if stateAfter != stateBefore {
-		t.Errorf("State changed after BufTooSmall: %v -> %v", stateBefore, stateAfter)
-	}
+			stateBefore := enc.State()
 
-	// Retry with larger buffer should succeed
-	_, err = enc.Finish(largeBuf)
-	if err != nil {
-		t.Fatalf("Finish() with large buffer error = %v", err)
-	}
+			smallBuf := make([]byte, 10)
+			_, err = enc.Finish(smallBuf)
+			if err != codec.ErrBufTooSmall {
+				t.Fatalf("Expected ErrBufTooSmall, got %v", err)
+			}
 
-	if enc.State() != codec.StateFinished {
-		t.Errorf("State = %v, want StateFinished", enc.State())
+			stateAfter := enc.State()
+			if stateAfter != stateBefore {
+				t.Errorf("State changed after BufTooSmall: %v -> %v", stateBefore, stateAfter)
+			}
+
+			n, err := enc.Finish(largeBuf)
+			if err != nil {
+				t.Fatalf("Finish() with large buffer error = %v", err)
+			}
+
+			if enc.State() != codec.StateFinished {
+				t.Errorf("State = %v, want StateFinished", enc.State())
+			}
+
+			decoded, err := codec.DecodeBuffer(tt.newDecoder(), largeBuf[:n])
+			if err != nil {
+				t.Fatalf("DecodeBuffer() error = %v", err)
+			}
+			if !bytes.Equal(decoded, input) {
+				t.Fatalf("decoded = %q, want %q", decoded, input)
+			}
+		})
 	}
 }
 
@@ -412,6 +470,54 @@ func TestBuffer_DecodeFullPath(t *testing.T) {
 	}
 }
 
+// TestBuffer_DecodeBufTooSmallTransactional tests that decoder Finish can be retried
+// with a larger buffer without losing buffered input.
+func TestBuffer_DecodeBufTooSmallTransactional(t *testing.T) {
+	tests := []struct {
+		name    string
+		encoder codec.Encoder
+		decoder codec.Decoder
+	}{
+		{"Huffman", huffman.NewStreamingEncoder(), huffman.NewStreamingDecoder()},
+		{"Arithmetic", arithmetic.NewStreamingEncoder(), arithmetic.NewStreamingDecoder()},
+		{"Range", rangecoder.NewStreamingEncoder(), rangecoder.NewStreamingDecoder()},
+		{"RLE", rle.NewStreamingEncoder(), rle.NewStreamingDecoder()},
+	}
+
+	input := []byte("Hello, streaming world! Hello, streaming world! Hello, streaming world!")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			encoded, err := codec.EncodeBuffer(tt.encoder, input)
+			if err != nil {
+				t.Fatalf("EncodeBuffer() error = %v", err)
+			}
+
+			_, err = tt.decoder.Process(encoded, make([]byte, 1))
+			if err != nil {
+				t.Fatalf("Process() error = %v", err)
+			}
+
+			smallBuf := make([]byte, 4)
+			_, err = tt.decoder.Finish(smallBuf)
+			if err != codec.ErrBufTooSmall {
+				t.Fatalf("Finish() small buffer error = %v, want ErrBufTooSmall", err)
+			}
+
+			largeBuf := make([]byte, len(input)+1024)
+			n, err := tt.decoder.Finish(largeBuf)
+			if err != nil {
+				t.Fatalf("Finish() retry error = %v", err)
+			}
+
+			decoded := largeBuf[:n]
+			if !bytes.Equal(decoded, input) {
+				t.Fatalf("decoded = %q, want %q", decoded, input)
+			}
+		})
+	}
+}
+
 // TestError_TruncatedFrame tests E1: truncated frame on decode.
 func TestError_TruncatedFrame(t *testing.T) {
 	input := []byte("test data for truncation")
@@ -449,22 +555,40 @@ func TestError_InputSizeLimit(t *testing.T) {
 		t.Errorf("MaxInputSize = %d, want %d", codec.MaxInputSize, 4*1024*1024*1024)
 	}
 
-	// Process up to limit
+	// Process to the limit without error.
 	for i := 0; i < 4096; i++ {
 		_, err := enc.Process(bigChunk, outBuf)
-		if err == codec.ErrSizeLimit {
-			// Expected - we hit the limit
-			if enc.State() != codec.StateError {
-				t.Errorf("State after size limit = %v, want StateError", enc.State())
-			}
-			return
-		}
-		if err != nil && err != codec.ErrSizeLimit {
-			t.Fatalf("Process() unexpected error = %v", err)
+		if err != nil {
+			t.Fatalf("Process() unexpected error at chunk %d = %v", i, err)
 		}
 	}
 
-	t.Log("Size limit test passed (limit enforced)")
+	// One more chunk must exceed the limit.
+	_, err := enc.Process(bigChunk, outBuf)
+	if err != codec.ErrSizeLimit {
+		t.Fatalf("Process() overflow error = %v, want ErrSizeLimit", err)
+	}
+
+	if enc.State() != codec.StateError {
+		t.Errorf("State after size limit = %v, want StateError", enc.State())
+	}
+}
+
+func TestDecodeBuffer_GrowsWithoutMaxAllocation(t *testing.T) {
+	input := bytes.Repeat([]byte("abcd"), 1024)
+	encoded, err := codec.EncodeBuffer(rle.NewStreamingEncoder(), input)
+	if err != nil {
+		t.Fatalf("EncodeBuffer() error = %v", err)
+	}
+
+	decoded, err := codec.DecodeBuffer(rle.NewStreamingDecoder(), encoded)
+	if err != nil {
+		t.Fatalf("DecodeBuffer() error = %v", err)
+	}
+
+	if !bytes.Equal(decoded, input) {
+		t.Fatalf("decoded = %q, want %q", decoded, input)
+	}
 }
 
 // TestConstants verifies security limit constants.
@@ -476,4 +600,3 @@ func TestConstants(t *testing.T) {
 		t.Errorf("MaxOutputSize = %d, want %d", codec.MaxOutputSize, 1*1024*1024*1024)
 	}
 }
-

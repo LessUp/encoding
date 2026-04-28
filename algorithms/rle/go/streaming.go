@@ -66,7 +66,7 @@ func (e *StreamingEncoder) Finish(out []byte) (int, error) {
 	}
 
 	var outBuf bytes.Buffer
-	err := Encode(e.inputBuf, &outBuf)
+	err := Encode(bytes.NewReader(e.inputBuf.Bytes()), &outBuf)
 	if err != nil {
 		e.state = codec.StateError
 		return 0, err
@@ -154,7 +154,7 @@ func (d *StreamingDecoder) Finish(out []byte) (int, error) {
 	}
 
 	var outBuf bytes.Buffer
-	err := Decode(d.inputBuf, &outBuf)
+	err := Decode(bytes.NewReader(d.inputBuf.Bytes()), &outBuf)
 	if err != nil {
 		d.state = codec.StateError
 		if err.Error() == "RLE data truncated: cannot read complete count field" ||

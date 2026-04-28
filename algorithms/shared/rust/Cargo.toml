@@ -11,3 +11,8 @@ path = "src/lib.rs"
 [dependencies]
 
 [dev-dependencies]
+huffman = { path = "../../huffman/rust" }
+arithmetic = { path = "../../arithmetic/rust" }
+rle = { path = "../../rle/rust" }
+rangecoder = { path = "../../range/rust" }
+rand = "0.8"

@@ -1,7 +1,7 @@
 // Lifecycle tests for the streaming API foundation.
 // These tests verify the contract defined in the design document.
 
-use compresskit_codec::codec::{CodecError, Encoder, State};
+use compresskit_codec::codec::{CodecError, Encoder, Decoder, State};
 
 #[test]
 fn test_lifecycle_basic() {
@@ -89,5 +89,83 @@ fn test_constants() {
     assert_eq!(MAX_OUTPUT_SIZE, 1 * 1024 * 1024 * 1024);
 }
 
-// Note: Full integration tests with actual Huffman/Arithmetic/Range/RLE encoders
-// are in each algorithm's own test module.
+// Integration tests for actual algorithm adapters
+
+#[test]
+fn test_huffman_implements_traits() {
+    use huffman::{StreamingEncoder, StreamingDecoder};
+    let _enc: Box<dyn Encoder> = Box::new(StreamingEncoder::new());
+    let _dec: Box<dyn Decoder> = Box::new(StreamingDecoder::new());
+}
+
+#[test]
+fn test_arithmetic_implements_traits() {
+    use arithmetic::{StreamingEncoder, StreamingDecoder};
+    let _enc: Box<dyn Encoder> = Box::new(StreamingEncoder::new());
+    let _dec: Box<dyn Decoder> = Box::new(StreamingDecoder::new());
+}
+
+#[test]
+fn test_rle_implements_traits() {
+    use rle::{StreamingEncoder, StreamingDecoder};
+    let _enc: Box<dyn Encoder> = Box::new(StreamingEncoder::new());
+    let _dec: Box<dyn Decoder> = Box::new(StreamingDecoder::new());
+}
+
+#[test]
+fn test_range_implements_traits() {
+    use rangecoder::{StreamingEncoder, StreamingDecoder};
+    let _enc: Box<dyn Encoder> = Box::new(StreamingEncoder::new());
+    let _dec: Box<dyn Decoder> = Box::new(StreamingDecoder::new());
+}
+
+#[test]
+fn test_huffman_roundtrip_via_traits() {
+    use huffman::{StreamingEncoder, StreamingDecoder};
+    let input = b"hello world";
+    let mut enc = StreamingEncoder::new();
+    let mut output = vec![0u8; 4096];
+    enc.process(input, &mut output).unwrap();
+    let written = enc.finish(&mut output).unwrap();
+    
+    let mut dec = StreamingDecoder::new();
+    let mut decoded = vec![0u8; 4096];
+    dec.process(&output[..written], &mut decoded).unwrap();
+    let dec_written = dec.finish(&mut decoded).unwrap();
+    
+    assert_eq!(&decoded[..dec_written], input);
+}
+
+#[test]
+fn test_arithmetic_roundtrip_via_traits() {
+    use arithmetic::{StreamingEncoder, StreamingDecoder};
+    let input = b"test data";
+    let mut enc = StreamingEncoder::new();
+    let mut output = vec![0u8; 4096];
+    enc.process(input, &mut output).unwrap();
+    let written = enc.finish(&mut output).unwrap();
+    
+    let mut dec = StreamingDecoder::new();
+    let mut decoded = vec![0u8; 4096];
+    dec.process(&output[..written], &mut decoded).unwrap();
+    let dec_written = dec.finish(&mut decoded).unwrap();
+    
+    assert_eq!(&decoded[..dec_written], input);
+}
+
+#[test]
+fn test_rle_roundtrip_via_traits() {
+    use rle::{StreamingEncoder, StreamingDecoder};
+    let input = b"aaabbbccc";
+    let mut enc = StreamingEncoder::new();
+    let mut output = vec![0u8; 4096];
+    enc.process(input, &mut output).unwrap();
+    let written = enc.finish(&mut output).unwrap();
+    
+    let mut dec = StreamingDecoder::new();
+    let mut decoded = vec![0u8; 4096];
+    dec.process(&output[..written], &mut decoded).unwrap();
+    let dec_written = dec.finish(&mut decoded).unwrap();
+    
+    assert_eq!(&decoded[..dec_written], input);
+}

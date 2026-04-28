@@ -8,4 +8,7 @@ rust-version = "1.70"
 name = "rle"
 path = "src/lib.rs"
 
+[dependencies]
+compresskit-codec = { path = "../../shared/rust" }
+
 [dev-dependencies]

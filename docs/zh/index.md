@@ -3,59 +3,87 @@ layout: home
 
 hero:
   name: CompressKit
-  text: 可阅读、可运行、可对比的无损压缩算法
-  tagline: 使用 C++17、Go、Rust 实现 Huffman、算术编码、区间编码和 RLE，并通过跨语言二进制兼容性验证。
+  text: 经典压缩算法，三语言实现
+  tagline: Huffman、算术编码、Range Coder 和 RLE 的 C++、Go、Rust 实现。跨语言验证，文档齐全，适合学习与生产。
   image:
     src: /logo.svg
     alt: CompressKit Logo
   actions:
     - theme: brand
-      text: 从指南开始
+      text: 快速开始
       link: /zh/guide/getting-started
     - theme: alt
-      text: 对比算法
+      text: 算法对比
       link: /zh/guide/algorithms
     - theme: alt
       text: English
       link: /en/
 
 features:
-  - icon: 🧩
-    title: 四种经典算法
-    details: Huffman、算术编码、区间编码、RLE 并排实现，便于学习算法与工程取舍。
-  - icon: 🌐
-    title: 三套语言实现
-    details: C++17、Go 1.21+、Rust 1.70+ 共享统一 CLI 形态和兼容文件格式。
-  - icon: ✅
-    title: 验证进入主流程
-    details: 测试基线包含 streaming 生命周期检查和可执行的跨语言解码矩阵。
+  - icon: 🔄
+    title: 跨语言验证
+    details: 每个算法都有 C++17、Go、Rust 三种实现，二进制格式完全一致。一种语言编码，另一种语言解码。
+  - icon: 📚
+    title: 可读性优先
+    details: 代码整洁、注释完善，专为教学设计。每个实现都控制在单文件内，真正可以读完。
+  - icon: ⚡
+    title: 生产可用
+    details: 安全限制（4 GiB 输入、1 GiB 输出）、流式 API、完整测试、清晰文档。
+  - icon: 🧪
+    title: 测试驱动
+    details: 144 项跨语言一致性测试确保二进制兼容。每次发布前都经过完整验证。
 ---
 
 <StatsBar />
 
-## 算法地图
+## 为什么选择 CompressKit？
+
+| 你的需求 | 我们的方案 |
+|----------|------------|
+| 学习压缩算法 | 单文件实现，代码可读 |
+| 跨语言兼容 | C++/Go/Rust 二进制格式一致 |
+| 生产使用 | 流式 API、安全限制、错误处理 |
+| 性能对比 | 运行 `make bench` 获取真实数据 |
+
+## 算法选择指南
 
 <AlgorithmGrid />
 
-## 最短有效路径
+## 30 秒快速上手
 
 ```bash
 git clone https://github.com/LessUp/compress-kit.git
 cd compress-kit
-make build
-make test
+make build && make test
 ```
 
-按目标阅读文档：
+搞定。所有 12 个实现（4 种算法 × 3 种语言）已构建并测试通过。
+
+## 独特之处
+
+**不是另一个"万能压缩"库。** CompressKit 是一个压缩算法实验室：
+
+- **透明格式** — 没有黑盒魔法，每个字节都有文档
+- **同构实现** — 同一算法、相同输出、不同语言
+- **教学导向** — 代码可读，测试可追踪
+- **验证优先** — 跨语言一致性是测试，不是附加功能
+
+## 魔数标识
+
+每个算法都有 4 字节魔数头部，可即时识别文件类型：
+
+| 算法 | 魔数 | 说明 |
+|------|------|------|
+| Huffman | `HFMN` | 前缀码压缩 |
+| 算术编码 | `AENC` | 熵最优编码 |
+| Range Coder | `RCNC` | 快速整数算术编码 |
+| RLE | `RLE\x00` | 行程编码 |
+
+## 下一步
 
 | 目标 | 页面 |
 |------|------|
-| 环境准备与首次运行 | [快速开始](/zh/guide/getting-started) |
-| 算法行为与取舍 | [算法详解](/zh/guide/algorithms) |
-| 公共 API 与 streaming 门面 | [API 参考](/zh/api/streaming) |
-| 兼容性验证 | [跨语言测试](/zh/testing/cross-language) |
-
-## 当前工程边界
-
-CompressKit 当前保持各算法既有二进制格式稳定。统一 frame 格式与 benchmark
-治理方案已作为未来 OpenSpec 设计上下文归档，只有重新以聚焦变更实施时才会进入主规范。
+| 本地构建运行 | [快速开始](/zh/guide/getting-started) |
+| 选择合适的算法 | [算法指南](/zh/guide/algorithms) |
+| 作为库使用 | [流式 API](/zh/api/streaming) |
+| 验证兼容性 | [跨语言测试](/zh/testing/cross-language) |

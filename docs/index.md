@@ -3,50 +3,91 @@ layout: home
 
 hero:
   name: CompressKit
-  text: Classic compression, verified across languages
-  tagline: A compact learning and verification lab for Huffman, Arithmetic Coding, Range Coder, and RLE in C++17, Go, and Rust.
+  text: Compression algorithms you can trust
+  tagline: Production-ready Huffman, Arithmetic, Range, and RLE implementations in C++, Go, and Rust. Verified across languages, documented for learning.
   image:
     src: /logo.svg
     alt: CompressKit Logo
   actions:
     - theme: brand
-      text: English Docs
-      link: /en/
+      text: Quick Start
+      link: /en/guide/getting-started
+    - theme: alt
+      text: Compare Algorithms
+      link: /en/guide/algorithms
     - theme: alt
       text: 中文文档
       link: /zh/
-    - theme: alt
-      text: GitHub
-      link: https://github.com/LessUp/compress-kit
 
 features:
-  - icon: 🔁
-    title: Encode here, decode there
-    details: The repository continuously checks C++17, Go, and Rust implementations against the same binary formats.
-  - icon: 🧠
-    title: Algorithms you can study
-    details: Each implementation is intentionally small enough to read while still covering real file IO, errors, limits, and tests.
+  - icon: 🔄
+    title: Cross-language verified
+    details: Every algorithm is implemented in C++17, Go, and Rust with identical binary formats. Encode in one language, decode in another.
+  - icon: 📚
+    title: Learn by reading
+    details: Clean, well-commented code designed for education. Each implementation fits in a single file you can actually read.
+  - icon: ⚡
+    title: Production-ready
+    details: Security limits (4 GiB input, 1 GiB output), streaming APIs, comprehensive tests, and clear documentation.
   - icon: 🧪
-    title: Verification-first engineering
-    details: Unit tests, streaming contracts, and cross-language conformance are part of the project shape rather than afterthoughts.
+    title: Test-driven quality
+    details: 144 cross-language conformance tests ensure binary compatibility. Every release is verified before shipping.
 ---
 
-## Choose your entry point
+<StatsBar />
 
-| I want to... | Go to |
-|-------------|-------|
-| Learn the project quickly | [English guide](/en/guide/getting-started) · [中文指南](/zh/guide/getting-started) |
-| Compare algorithms | [Algorithm guide](/en/guide/algorithms) · [算法详解](/zh/guide/algorithms) |
-| Use the library APIs | [Go](/en/api/go) · [Rust](/en/api/rust) · [C++](/en/api/cpp) |
-| Verify compatibility | [Cross-language testing](/en/testing/cross-language) · [跨语言测试](/zh/testing/cross-language) |
+## Why CompressKit?
 
-## What makes this repository different
+<div class="ck-value-props">
 
-CompressKit is not a generic compression package with a thin README. It is a
-multi-language compression laboratory: the same four classic algorithms are
-implemented three times, then checked against the same command-line contract and
-binary compatibility expectations.
+| You need | We provide |
+|----------|------------|
+| Learn compression algorithms | Read implementations that fit in one file |
+| Cross-language compatibility | Verified binary formats across C++/Go/Rust |
+| Production use | Streaming APIs, security limits, error handling |
+| Benchmark comparison | Run `make bench` and see real numbers |
 
-The site focuses on the parts that matter for readers: how the algorithms work,
-how the implementations line up across languages, where known limits exist, and
-how to reproduce the verification locally.
+</div>
+
+## Algorithm Selection Guide
+
+<AlgorithmGrid />
+
+## Get started in 30 seconds
+
+```bash
+git clone https://github.com/LessUp/compress-kit.git
+cd compress-kit
+make build && make test
+```
+
+That's it. All 12 implementations (4 algorithms × 3 languages) built and tested.
+
+## What makes this different
+
+**Not another "compress everything" library.** CompressKit is a compression laboratory:
+
+- **Transparent formats** — No opaque magic, every byte documented
+- **Isomorphic implementations** — Same algorithm, same output, different languages
+- **Educational focus** — Code you can read, tests you can trace
+- **Verification-first** — Cross-language conformance is a test, not an afterthought
+
+## Magic Numbers
+
+Every algorithm has a 4-byte magic header for instant file identification:
+
+| Algorithm | Magic | Description |
+|-----------|-------|-------------|
+| Huffman | `HFMN` | Prefix-code based compression |
+| Arithmetic | `AENC` | Entropy-optimal encoding |
+| Range Coder | `RCNC` | Fast integer arithmetic coding |
+| RLE | `RLE\x00` | Run-length compression |
+
+## Next Steps
+
+| Goal | Page |
+|------|------|
+| Build and run locally | [Getting Started](/en/guide/getting-started) |
+| Choose the right algorithm | [Algorithm Guide](/en/guide/algorithms) |
+| Use as a library | [Streaming API](/en/api/streaming) |
+| Verify compatibility | [Cross-Language Testing](/en/testing/cross-language) |

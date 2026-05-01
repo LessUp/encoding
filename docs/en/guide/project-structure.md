@@ -43,7 +43,7 @@ The current terminal baseline keeps per-algorithm formats stable:
 | Huffman | `HFMN` + frequency table | `.huf` | Bit stream |
 | Arithmetic | `AENC` + frequency table | `.aenc` | Bit stream |
 | Range Coder | `RCNC` + frequency table | `.rcnc` | Byte stream |
-| RLE | No magic header | `.rle` | `(count: uint32 LE, value: byte)` pairs |
+| RLE | `RLE\x00` | `.rle` | Magic + `(count: uint32 LE, value: byte)` pairs |
 
 Future shared-frame proposals are archived under `openspec/changes/archive/` and
 are not part of the active file format contract.

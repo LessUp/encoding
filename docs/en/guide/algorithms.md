@@ -169,12 +169,13 @@ The simplest compression algorithm, ideal for data with consecutive repeated byt
 
 ### File Format
 
-Stores repeated `(count, value)` pairs:
-
 | Field | Size | Description |
 |-------|------|-------------|
-| Count | 4 bytes | Little-endian unsigned int |
+| Magic | 4 bytes | `RLE\x00` (0x52 0x4C 0x45 0x00) |
+| Count | 4 bytes | Little-endian unsigned int (run length) |
 | Value | 1 byte | The repeated byte |
+
+Each run is stored as a `(count, value)` pair after the magic header.
 
 ### Characteristics
 

@@ -3,7 +3,7 @@
 # Run manually: pre-commit run --all-files
 
 repos:
-  # Go formatting
+  # General checks (consolidated)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -12,6 +12,16 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
         args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # C++ formatting (uses existing .clang-format)
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.1
+    hooks:
+      - id: clang-format
+        files: \.(cpp|h)$
 
   # Go formatting and linting
   - repo: https://github.com/TekWizely/pre-commit-golang
@@ -22,26 +32,20 @@ repos:
       - id: go-vet
         files: \.go$
 
-  # Rust formatting
+  # Rust formatting and linting (uses existing .clippy.toml)
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:
       - id: fmt
         files: \.rs$
         args: ['--check']
+      - id: clippy
+        files: \.rs$
 
-  # Python
+  # Python formatting
   - repo: https://github.com/psf/black
     rev: 24.1.1
     hooks:
       - id: black
         language_version: python3
         files: \.py$
-
-  # General checks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: check-case-conflict
-      - id: check-merge-conflict
-      - id: detect-private-key

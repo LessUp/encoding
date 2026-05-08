@@ -123,3 +123,51 @@ pub(crate) fn decode_buffer_with_limit(
 pub fn decode_buffer(decoder: &mut dyn Decoder, input: &[u8]) -> Result<Vec<u8>, CodecError> {
     decode_buffer_with_limit(decoder, input, MAX_OUTPUT_SIZE)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::decode_buffer_with_limit;
+    use crate::codec::encoder::Decoder;
+    use crate::codec::error::{CodecError, State};
+
+    struct LimitHitProcessDecoder {
+        process_calls: usize,
+        finish_calls: usize,
+    }
+
+    impl Decoder for LimitHitProcessDecoder {
+        fn process(&mut self, _: &[u8], _: &mut [u8]) -> Result<usize, CodecError> {
+            self.process_calls += 1;
+            Err(CodecError::BufTooSmall)
+        }
+
+        fn flush(&mut self, _: &mut [u8]) -> Result<usize, CodecError> {
+            Ok(0)
+        }
+
+        fn finish(&mut self, _: &mut [u8]) -> Result<usize, CodecError> {
+            self.finish_calls += 1;
+            Err(CodecError::Other("finish should not be called".into()))
+        }
+
+        fn reset(&mut self) {}
+
+        fn state(&self) -> State {
+            State::Streaming
+        }
+    }
+
+    #[test]
+    fn decode_buffer_stops_growing_at_decode_limit_boundary() {
+        let mut decoder = LimitHitProcessDecoder {
+            process_calls: 0,
+            finish_calls: 0,
+        };
+
+        let err = decode_buffer_with_limit(&mut decoder, b"", 1024).unwrap_err();
+
+        assert_eq!(err, CodecError::SizeLimit);
+        assert_eq!(decoder.process_calls, 1);
+        assert_eq!(decoder.finish_calls, 0);
+    }
+}

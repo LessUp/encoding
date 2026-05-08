@@ -201,26 +201,16 @@ bool rle_decode_file(const std::string& input_path, const std::string& output_pa
 }
 
 #ifndef COMPRESSKIT_NO_MAIN
+#include "compresskit/cli_launcher.hpp"
+
 int main(int argc, char** argv) {
-    if (argc != 4) {
-        std::cerr << "usage: " << argv[0] << " encode|decode input output\n";
-        return 1;
-    }
-    std::string mode = argv[1];
-    std::string input_path = argv[2];
-    std::string output_path = argv[3];
-
-    bool ok = true;
-
-    if (mode == "encode") {
-        ok = compresskit::encode_file_via_buffer(rle_encode_file, input_path, output_path);
-    } else if (mode == "decode") {
-        ok = compresskit::decode_file_via_buffer(rle_decode_file, input_path, output_path);
-    } else {
-        std::cerr << "unknown mode: " << mode << ", expected encode or decode\n";
-        return 1;
-    }
-
-    return ok ? 0 : 1;
+    compresskit::cli::Algorithm algo{
+        [](const std::string& in, const std::string& out) {
+            return compresskit::encode_file_via_buffer(rle_encode_file, in, out);
+        },
+        [](const std::string& in, const std::string& out) {
+            return compresskit::decode_file_via_buffer(rle_decode_file, in, out);
+        }};
+    return compresskit::cli::run("rle", algo, argc, argv);
 }
 #endif

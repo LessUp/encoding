@@ -1,33 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/LessUp/compress-kit/algorithms/shared/go/cli"
 	"rle"
 )
 
-func main() {
-	if len(os.Args) != 4 {
-		fmt.Fprintf(os.Stderr, "usage: %s encode|decode input output\n", os.Args[0])
-		os.Exit(1)
-	}
-	mode := os.Args[1]
-	inputPath := os.Args[2]
-	outputPath := os.Args[3]
+type RLEProcessor struct{}
 
-	var err error
-	switch mode {
-	case "encode":
-		err = rle.EncodeFile(inputPath, outputPath)
-	case "decode":
-		err = rle.DecodeFile(inputPath, outputPath)
-	default:
-		fmt.Fprintln(os.Stderr, "unknown mode, expected encode or decode")
-		os.Exit(1)
-	}
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+func (p *RLEProcessor) EncodeFile(inputPath, outputPath string) error {
+	return rle.EncodeFile(inputPath, outputPath)
+}
+
+func (p *RLEProcessor) DecodeFile(inputPath, outputPath string) error {
+	return rle.DecodeFile(inputPath, outputPath)
+}
+
+func main() {
+	cli.Run("rle", &RLEProcessor{})
 }

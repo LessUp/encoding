@@ -93,9 +93,7 @@ pub fn decode(input: &[u8]) -> Result<Vec<u8>, io::Error> {
 }
 
 // Streaming adapters
-use compresskit_codec::codec::{
-    BufferedDecoder, BufferedEncoder, CodecError, Decoder, Encoder,
-};
+use compresskit_codec::codec::{BufferedDecoder, BufferedEncoder, CodecError, Decoder, Encoder};
 
 /// Creates a new streaming RLE encoder.
 pub fn new_encoder() -> impl Encoder {

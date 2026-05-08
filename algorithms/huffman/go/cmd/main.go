@@ -1,34 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/LessUp/compress-kit/algorithms/shared/go/cli"
 	"huffman"
 )
 
+type HuffmanProcessor struct{}
+
+func (p *HuffmanProcessor) EncodeFile(inputPath, outputPath string) error {
+	return huffman.EncodeFile(inputPath, outputPath)
+}
+
+func (p *HuffmanProcessor) DecodeFile(inputPath, outputPath string) error {
+	return huffman.DecodeFile(inputPath, outputPath)
+}
+
 func main() {
-	if len(os.Args) != 4 {
-		fmt.Fprintf(os.Stderr, "Usage: %s encode|decode input output\n", os.Args[0])
-		os.Exit(1)
-	}
-	mode := os.Args[1]
-	inputPath := os.Args[2]
-	outputPath := os.Args[3]
-
-	var err error
-
-	switch mode {
-	case "encode":
-		err = huffman.EncodeFile(inputPath, outputPath)
-	case "decode":
-		err = huffman.DecodeFile(inputPath, outputPath)
-	default:
-		fmt.Fprintln(os.Stderr, "Unknown mode")
-		os.Exit(1)
-	}
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+	cli.Run("huffman", &HuffmanProcessor{})
 }

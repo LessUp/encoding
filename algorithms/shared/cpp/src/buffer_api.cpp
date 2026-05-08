@@ -121,6 +121,31 @@ Result<std::size_t> invalid_state_result() {
     return {StatusCode::ERR_INVALID_STATE, 0};
 }
 
+template <typename Step>
+Result<std::size_t> run_buffer_step(std::vector<uint8_t>& out, std::size_t total_written,
+                                    std::size_t limit, Step step) {
+    for (;;) {
+        Result<std::size_t> result =
+            step({out.data() + total_written, out.size() - total_written});
+        if (result.status != StatusCode::BUF_TOO_SMALL) {
+            if (!result.ok()) {
+                return result;
+            }
+            if (total_written > limit || result.value > limit - total_written) {
+                return {StatusCode::ERR_SIZE_LIMIT, 0};
+            }
+            return {StatusCode::OK, total_written + result.value};
+        }
+
+        total_written += result.value;
+        if (total_written > limit || out.size() >= limit) {
+            return {StatusCode::ERR_SIZE_LIMIT, 0};
+        }
+
+        out.resize(std::min(limit, std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+    }
+}
+
 }  // namespace
 
 BufferEncoder::BufferEncoder(FileTransform transform)
@@ -277,37 +302,18 @@ Result<std::vector<uint8_t>> encode_buffer(Encoder& encoder, const std::vector<u
     std::vector<uint8_t> out(initial_size);
     std::size_t total_written = 0;
 
-    for (;;) {
-        Result<std::size_t> result = encoder.process(
-            {input.data(), input.size()}, {out.data() + total_written, out.size() - total_written});
-        if (result.status != StatusCode::BUF_TOO_SMALL) {
-            if (!result.ok()) {
-                return {result.status, {}};
-            }
-            total_written += result.value;
-            break;
+    for (auto step : {0, 1}) {
+        Result<std::size_t> result = run_buffer_step(
+            out, total_written, limit, [&](MutableByteView out_view) {
+                if (step == 0) {
+                    return encoder.process({input.data(), input.size()}, out_view);
+                }
+                return encoder.finish(out_view);
+            });
+        if (!result.ok()) {
+            return {result.status, {}};
         }
-        total_written += result.value;
-        if (total_written > limit || out.size() >= limit) {
-            return {StatusCode::ERR_SIZE_LIMIT, {}};
-        }
-        out.resize(std::min(limit, std::max<std::size_t>(out.size() * 2, out.size() + 1)));
-    }
-
-    for (;;) {
-        Result<std::size_t> result =
-            encoder.finish({out.data() + total_written, out.size() - total_written});
-        if (result.status != StatusCode::BUF_TOO_SMALL) {
-            if (!result.ok()) {
-                return {result.status, {}};
-            }
-            total_written += result.value;
-            break;
-        }
-        if (out.size() >= limit) {
-            return {StatusCode::ERR_SIZE_LIMIT, {}};
-        }
-        out.resize(std::min(limit, std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        total_written = result.value;
     }
 
     if (total_written > limit) {
@@ -325,39 +331,18 @@ Result<std::vector<uint8_t>> decode_buffer(Decoder& decoder, const std::vector<u
     std::vector<uint8_t> out(input.size() + 1024);
     std::size_t total_written = 0;
 
-    for (;;) {
-        Result<std::size_t> result = decoder.process(
-            {input.data(), input.size()}, {out.data() + total_written, out.size() - total_written});
-        if (result.status != StatusCode::BUF_TOO_SMALL) {
-            if (!result.ok()) {
-                return {result.status, {}};
-            }
-            total_written += result.value;
-            break;
+    for (auto step : {0, 1}) {
+        Result<std::size_t> result = run_buffer_step(
+            out, total_written, kMaxOutputSize, [&](MutableByteView out_view) {
+                if (step == 0) {
+                    return decoder.process({input.data(), input.size()}, out_view);
+                }
+                return decoder.finish(out_view);
+            });
+        if (!result.ok()) {
+            return {result.status, {}};
         }
-        total_written += result.value;
-        if (total_written > kMaxOutputSize || out.size() >= kMaxOutputSize) {
-            return {StatusCode::ERR_SIZE_LIMIT, {}};
-        }
-        out.resize(std::min<std::size_t>(kMaxOutputSize,
-                                         std::max<std::size_t>(out.size() * 2, out.size() + 1)));
-    }
-
-    for (;;) {
-        Result<std::size_t> result =
-            decoder.finish({out.data() + total_written, out.size() - total_written});
-        if (result.status != StatusCode::BUF_TOO_SMALL) {
-            if (!result.ok()) {
-                return {result.status, {}};
-            }
-            total_written += result.value;
-            break;
-        }
-        if (out.size() >= kMaxOutputSize) {
-            return {StatusCode::ERR_SIZE_LIMIT, {}};
-        }
-        out.resize(std::min<std::size_t>(kMaxOutputSize,
-                                         std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        total_written = result.value;
     }
 
     if (total_written > kMaxOutputSize) {

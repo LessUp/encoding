@@ -1,6 +1,7 @@
 package codec
 
 const encodeBufferInitialSlack = 2048 // Extra room for small outputs before the first retry.
+const decodeBufferInitialSlack = 1024 // Extra room for small decoded outputs before the first retry.
 
 func growBuffer(currentLen int, limit int) int {
 	if currentLen <= 0 {
@@ -85,7 +86,7 @@ func DecodeBuffer(decoder Decoder, input []byte) ([]byte, error) {
 		return nil, ErrSizeLimit
 	}
 
-	return decodeBufferWithLimit(decoder, input, len(input)+1024, MaxOutputSize)
+	return decodeBufferWithLimit(decoder, input, len(input)+decodeBufferInitialSlack, MaxOutputSize)
 }
 
 func decodeBufferWithLimit(decoder Decoder, input []byte, initialSize int, limit int) ([]byte, error) {

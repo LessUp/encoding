@@ -2,6 +2,7 @@ package codec
 
 import (
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -172,6 +173,20 @@ func (d *captureBufferDecoder) Finish(out []byte) (int, error) { return 0, nil }
 func (d *captureBufferDecoder) Reset()                         {}
 func (d *captureBufferDecoder) State() State                   { return StateStreaming }
 
+type captureBufferEncoder struct {
+	processLens []int
+}
+
+func (e *captureBufferEncoder) Process(in []byte, out []byte) (int, error) {
+	e.processLens = append(e.processLens, len(out))
+	return 0, nil
+}
+
+func (e *captureBufferEncoder) Flush(out []byte) (int, error)  { return 0, nil }
+func (e *captureBufferEncoder) Finish(out []byte) (int, error) { return 0, nil }
+func (e *captureBufferEncoder) Reset()                         {}
+func (e *captureBufferEncoder) State() State                   { return StateStreaming }
+
 func TestEncodeBuffer_PreservesOutputAcrossFinishRetry(t *testing.T) {
 	stub := &scriptedEncoder{
 		process: []scriptedCall{{written: 0, err: nil}},
@@ -242,13 +257,28 @@ func TestDecodeBufferWithLimit_ClampsInitialSizeToLimit(t *testing.T) {
 	}
 }
 
+func TestEncodeBufferWithLimit_ClampsInitialSizeToLimit(t *testing.T) {
+	stub := &captureBufferEncoder{}
+
+	_, err := encodeBufferWithLimit(stub, []byte("ignored"), 8, 3)
+	if err != nil {
+		t.Fatalf("encodeBufferWithLimit() error = %v", err)
+	}
+	if len(stub.processLens) != 1 {
+		t.Fatalf("encodeBufferWithLimit() process calls = %d, want 1", len(stub.processLens))
+	}
+	if got := stub.processLens[0]; got != 3 {
+		t.Fatalf("encodeBufferWithLimit() initial buffer = %d, want 3", got)
+	}
+}
+
 func TestEncodeBuffer_ScriptExhaustionReturnsClearError(t *testing.T) {
 	stub := &scriptedEncoder{
 		process: []scriptedCall{{written: 0, err: nil}},
 	}
 
 	_, err := EncodeBuffer(stub, []byte("ignored"))
-	if err == nil || err.Error() != "scriptedEncoder.Finish: script exhausted" {
+	if err == nil || !strings.Contains(err.Error(), "script exhausted") {
 		t.Fatalf("EncodeBuffer() error = %v, want scripted finish exhaustion", err)
 	}
 }

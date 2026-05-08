@@ -59,6 +59,17 @@ std::size_t encode_limit_for(std::size_t input_size) {
     return input_size * 8 + kInitialEncodeOverhead;
 }
 
+std::size_t grow_buffer(std::size_t current_len, std::size_t limit) {
+    if (current_len == 0) {
+        return std::min<std::size_t>(1024, limit);
+    }
+    std::size_t next = current_len * 2;
+    if (next < current_len) {  // overflow
+        return limit;
+    }
+    return std::min(next, limit);
+}
+
 bool write_file(const std::string& path, const std::vector<uint8_t>& data) {
     std::ofstream out(path, std::ios::binary);
     if (!out) {
@@ -291,7 +302,7 @@ Result<std::vector<uint8_t>> encode_buffer(Encoder& encoder, const std::vector<u
         if (total_written > limit || out.size() >= limit) {
             return {StatusCode::ERR_SIZE_LIMIT, {}};
         }
-        out.resize(std::min(limit, std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        out.resize(grow_buffer(out.size(), limit));
     }
 
     for (;;) {
@@ -307,7 +318,7 @@ Result<std::vector<uint8_t>> encode_buffer(Encoder& encoder, const std::vector<u
         if (out.size() >= limit) {
             return {StatusCode::ERR_SIZE_LIMIT, {}};
         }
-        out.resize(std::min(limit, std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        out.resize(grow_buffer(out.size(), limit));
     }
 
     if (total_written > limit) {
@@ -339,8 +350,7 @@ Result<std::vector<uint8_t>> decode_buffer(Decoder& decoder, const std::vector<u
         if (total_written > kMaxOutputSize || out.size() >= kMaxOutputSize) {
             return {StatusCode::ERR_SIZE_LIMIT, {}};
         }
-        out.resize(std::min<std::size_t>(kMaxOutputSize,
-                                         std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        out.resize(grow_buffer(out.size(), kMaxOutputSize));
     }
 
     for (;;) {
@@ -356,8 +366,7 @@ Result<std::vector<uint8_t>> decode_buffer(Decoder& decoder, const std::vector<u
         if (out.size() >= kMaxOutputSize) {
             return {StatusCode::ERR_SIZE_LIMIT, {}};
         }
-        out.resize(std::min<std::size_t>(kMaxOutputSize,
-                                         std::max<std::size_t>(out.size() * 2, out.size() + 1)));
+        out.resize(grow_buffer(out.size(), kMaxOutputSize));
     }
 
     if (total_written > kMaxOutputSize) {

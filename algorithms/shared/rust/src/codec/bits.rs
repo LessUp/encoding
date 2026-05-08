@@ -190,13 +190,13 @@ mod tests {
     #[test]
     fn bit_writer_basic() {
         let mut writer = BitWriter::new();
-        writer.write_bit(true);  // 1
+        writer.write_bit(true); // 1
         writer.write_bit(false); // 0
-        writer.write_bit(true);  // 1
+        writer.write_bit(true); // 1
         writer.write_bit(false); // 0
-        writer.write_bit(true);  // 1
+        writer.write_bit(true); // 1
         writer.write_bit(false); // 0
-        writer.write_bit(true);  // 1
+        writer.write_bit(true); // 1
         writer.write_bit(false); // 0
         let bytes = writer.finish();
         assert_eq!(bytes, vec![0b10101010]);
@@ -237,13 +237,13 @@ mod tests {
         let data = vec![0b10101010];
         let mut reader = BitReader::new(&data);
 
-        assert!(reader.read_bit());  // 1
+        assert!(reader.read_bit()); // 1
         assert!(!reader.read_bit()); // 0
-        assert!(reader.read_bit());  // 1
+        assert!(reader.read_bit()); // 1
         assert!(!reader.read_bit()); // 0
-        assert!(reader.read_bit());  // 1
+        assert!(reader.read_bit()); // 1
         assert!(!reader.read_bit()); // 0
-        assert!(reader.read_bit());  // 1
+        assert!(reader.read_bit()); // 1
         assert!(!reader.read_bit()); // 0
         assert!(reader.is_empty());
     }

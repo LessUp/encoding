@@ -373,6 +373,8 @@ bool rangecoder_decode_file(const std::string& input_path, const std::string& ou
 }
 
 #ifndef COMPRESSKIT_NO_MAIN
+#include "compresskit/cli_launcher.hpp"
+
 int main(int argc, char** argv) {
     try {
         if (argc < 2) {
@@ -382,30 +384,17 @@ int main(int argc, char** argv) {
             return 1;
         }
         std::string mode = argv[1];
-        if (mode == "encode") {
-            if (argc != 4) {
-                std::cerr << "Usage: " << argv[0] << " encode input output\n";
-                return 1;
-            }
-            std::string input_path = argv[2];
-            std::string output_path = argv[3];
-            if (!compresskit::encode_file_via_buffer(rangecoder_encode_file, input_path,
-                                                     output_path)) {
-                return 1;
-            }
-        } else if (mode == "decode") {
-            if (argc != 4) {
-                std::cerr << "Usage: " << argv[0] << " decode input output\n";
-                return 1;
-            }
-            std::string input_path = argv[2];
-            std::string output_path = argv[3];
-            if (!compresskit::decode_file_via_buffer(rangecoder_decode_file, input_path,
-                                                     output_path)) {
-                return 1;
-            }
+        if (mode == "encode" || mode == "decode") {
+            compresskit::cli::Algorithm algo{
+                [](const std::string& in, const std::string& out) {
+                    return compresskit::encode_file_via_buffer(rangecoder_encode_file, in, out);
+                },
+                [](const std::string& in, const std::string& out) {
+                    return compresskit::decode_file_via_buffer(rangecoder_decode_file, in, out);
+                }};
+            return compresskit::cli::run("rangecoder", algo, argc, argv);
         } else if (mode == "bench") {
-            std::size_t size_bytes = 1u << 20;  // 1 MiB
+            std::size_t size_bytes = 1u << 20;
             int iterations = 20;
             if (argc >= 3) {
                 size_bytes = static_cast<std::size_t>(std::stoul(argv[2]));
@@ -415,7 +404,7 @@ int main(int argc, char** argv) {
             }
             run_benchmark(size_bytes, iterations);
         } else {
-            std::cerr << "Unknown mode\n";
+            std::cerr << "unknown mode, expected encode, decode, or bench\n";
             return 1;
         }
     } catch (const std::exception& ex) {

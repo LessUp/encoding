@@ -4,57 +4,49 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LessUp/compress-kit/algorithms/shared/go/cli"
 	"github.com/LessUp/compress-kit/algorithms/shared/go/codec"
 	"rangecoder"
 )
 
-// Range coder CLI 封装。
-// Read entire file into memory，调用 rangecoder 库执行编解码，写出结果。
-// 文件格式与 C++/Rust 实现完全一致，支持交叉编解码验证。
+type RangeProcessor struct{}
+
+func (p *RangeProcessor) EncodeFile(inputPath, outputPath string) error {
+	data, err := os.ReadFile(inputPath)
+	if err != nil {
+		return fmt.Errorf("cannot open input file: %s: %w", inputPath, err)
+	}
+
+	encoded, err := codec.EncodeBuffer(rangecoder.NewStreamingEncoder(), data)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(outputPath, encoded, 0o644); err != nil {
+		return fmt.Errorf("cannot open output file: %s: %w", outputPath, err)
+	}
+
+	return nil
+}
+
+func (p *RangeProcessor) DecodeFile(inputPath, outputPath string) error {
+	data, err := os.ReadFile(inputPath)
+	if err != nil {
+		return fmt.Errorf("cannot open input file: %s: %w", inputPath, err)
+	}
+
+	decoded, err := codec.DecodeBuffer(rangecoder.NewStreamingDecoder(), data)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(outputPath, decoded, 0o644); err != nil {
+		return fmt.Errorf("cannot open output file: %s: %w", outputPath, err)
+	}
+
+	return nil
+}
 
 func main() {
-	if len(os.Args) != 4 {
-		fmt.Fprintf(os.Stderr, "Usage: %s encode|decode input output\n", os.Args[0])
-		os.Exit(1)
-	}
-
-	mode := os.Args[1]
-	inputPath := os.Args[2]
-	outputPath := os.Args[3]
-
-	switch mode {
-	case "encode":
-		data, err := os.ReadFile(inputPath)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "cannot read input file: %v\n", err)
-			os.Exit(1)
-		}
-		encoded, err := codec.EncodeBuffer(rangecoder.NewStreamingEncoder(), data)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "encode failed: %v\n", err)
-			os.Exit(1)
-		}
-		if err := os.WriteFile(outputPath, encoded, 0o644); err != nil {
-			fmt.Fprintf(os.Stderr, "cannot write output file: %v\n", err)
-			os.Exit(1)
-		}
-	case "decode":
-		data, err := os.ReadFile(inputPath)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "cannot read input file: %v\n", err)
-			os.Exit(1)
-		}
-		decoded, err := codec.DecodeBuffer(rangecoder.NewStreamingDecoder(), data)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "decode failed: %v\n", err)
-			os.Exit(1)
-		}
-		if err := os.WriteFile(outputPath, decoded, 0o644); err != nil {
-			fmt.Fprintf(os.Stderr, "cannot write output file: %v\n", err)
-			os.Exit(1)
-		}
-	default:
-		fmt.Fprintln(os.Stderr, "unknown mode, expected encode or decode")
-		os.Exit(1)
-	}
+	cli.Run("rangecoder", &RangeProcessor{})
 }

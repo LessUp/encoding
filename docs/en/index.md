@@ -4,52 +4,17 @@ layout: home
 hero:
   name: CompressKit
   text: Compression algorithms you can trust
-  tagline: Production-ready Huffman, Arithmetic, Range, and RLE implementations in C++, Go, and Rust. Verified across languages, documented for learning.
-  image:
-    src: /logo.svg
-    alt: CompressKit Logo
+  tagline: Huffman, Arithmetic, Range, and RLE in C++17, Go, and Rust
   actions:
     - theme: brand
-      text: Quick Start
+      text: Get Started
       link: /en/guide/getting-started
     - theme: alt
-      text: Compare Algorithms
-      link: /en/guide/algorithms
-    - theme: alt
-      text: 中文
-      link: /zh/
-
-features:
-  - icon: 🔄
-    title: Cross-language verified
-    details: Every algorithm is implemented in C++17, Go, and Rust with identical binary formats. Encode in one language, decode in another.
-  - icon: 📚
-    title: Learn by reading
-    details: Clean, well-commented code designed for education. Each implementation fits in a single file you can actually read.
-  - icon: ⚡
-    title: Production-ready
-    details: Security limits (4 GiB input, 1 GiB output), streaming APIs, comprehensive tests, and clear documentation.
-  - icon: 🧪
-    title: Test-driven quality
-    details: 144 cross-language conformance tests ensure binary compatibility. Every release is verified before shipping.
+      text: View on GitHub
+      link: https://github.com/LessUp/compress-kit
 ---
 
-<StatsBar />
-
-## Why CompressKit?
-
-| You need | We provide |
-|----------|------------|
-| Learn compression algorithms | Read implementations that fit in one file |
-| Cross-language compatibility | Verified binary formats across C++/Go/Rust |
-| Production use | Streaming APIs, security limits, error handling |
-| Benchmark comparison | Run `make bench` and see real numbers |
-
-## Algorithm Selection Guide
-
-<AlgorithmGrid />
-
-## Get started in 30 seconds
+## Quick Start
 
 ```bash
 git clone https://github.com/LessUp/compress-kit.git
@@ -57,33 +22,28 @@ cd compress-kit
 make build && make test
 ```
 
-That's it. All 12 implementations (4 algorithms × 3 languages) built and tested.
+## Algorithms
 
-## What makes this different
+| Algorithm | Best For | Speed |
+|-----------|----------|-------|
+| [Huffman](/en/algorithms/huffman) | General purpose, text | Fast |
+| [Arithmetic](/en/algorithms/arithmetic) | Maximum compression | Medium |
+| [Range Coder](/en/algorithms/range) | Production systems | Fast |
+| [RLE](/en/algorithms/rle) | Repetitive data | Very Fast |
 
-**Not another "compress everything" library.** CompressKit is a compression laboratory:
+## Cross-Language Compatibility
 
-- **Transparent formats** — No opaque magic, every byte documented
-- **Isomorphic implementations** — Same algorithm, same output, different languages
-- **Educational focus** — Code you can read, tests you can trace
-- **Verification-first** — Cross-language conformance is a test, not an afterthought
+Encode in C++, decode in Go. Encode in Rust, decode in C++. All implementations produce identical binary output.
 
-## Magic Numbers
+```bash
+# C++ encode, Go decode
+./cpp/huffman encode input.txt output.huf
+./go/huffman decode output.huf decoded.txt
+# Works perfectly — same bytes, different languages
+```
 
-Every algorithm has a 4-byte magic header for instant file identification:
+## Next
 
-| Algorithm | Magic | Description |
-|-----------|-------|-------------|
-| Huffman | `HFMN` | Prefix-code based compression |
-| Arithmetic | `AENC` | Entropy-optimal encoding |
-| Range Coder | `RCNC` | Fast integer arithmetic coding |
-| RLE | `RLE\x00` | Run-length compression |
-
-## Next Steps
-
-| Goal | Page |
-|------|------|
-| Build and run locally | [Getting Started](/en/guide/getting-started) |
-| Choose the right algorithm | [Algorithm Guide](/en/guide/algorithms) |
-| Use as a library | [Streaming API](/en/api/streaming) |
-| Verify compatibility | [Cross-Language Testing](/en/testing/cross-language) |
+- [Build instructions](/en/guide/getting-started) — Get running locally
+- [Algorithm guide](/en/guide/algorithms) — Choose the right one
+- [API reference](/en/api/streaming) — Use as a library

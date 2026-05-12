@@ -8,7 +8,7 @@
 - 共享 streaming 实现 `NewStreamingEncoder()` / `NewStreamingDecoder()`
 - 共享 buffer helper：`github.com/LessUp/compress-kit/algorithms/shared/go/codec`
 
-## Huffman 编码 (`algorithms/huffman/go`)
+## Huffman (`algorithms/huffman/go`)
 
 ### 导入
 
@@ -54,7 +54,7 @@ if err := huffman.Encode(in, out); err != nil {
 
 ---
 
-## 算术编码 (`algorithms/arithmetic/go`)
+## Arithmetic (`algorithms/arithmetic/go`)
 
 ### 导入
 
@@ -75,15 +75,22 @@ import "arithmetic"
 
 #### `ScaleFrequencies(freq []uint32)`
 
-将频率归一化到 `MaxTotal`（16M）以内。
+将频率归一化到 `MaxTotal`（16M）以内。构建自定义频率表时有用。
 
 #### `BuildCumulative(freq []uint32) []uint32`
 
 从原始频率构建累积频率表。
 
+### 常量
+
+| 常量 | 值 | 描述 |
+|------|-----|------|
+| `MaxTotal` | 16,777,216 | 最大总频率 |
+| `MaxInputSize` | 4 GiB | 最大允许输入大小 |
+
 ---
 
-## 区间编码 (`algorithms/range/go`)
+## Range Coder (`algorithms/range/go`)
 
 ### 导入
 
@@ -96,8 +103,14 @@ import "rangecoder"
 - `Encode(data []byte) ([]byte, error)` — 返回编码后的字节切片
 - `Decode(data []byte) ([]byte, error)` — 返回解码后的字节切片
 
+### 常量
+
+| 常量 | 值 | 描述 |
+|------|-----|------|
+| `MaxOutputSize` | 1 GiB | 最大输出大小，防止解压缩炸弹 |
+
 ::: tip 提示
-区间编码使用字节级 I/O（而非比特级），比算术编码更高效，同时保持几乎相同的压缩率。
+Range Coder 使用字节级 I/O（而非比特级），比 Arithmetic 更高效，同时保持几乎相同的压缩率。
 :::
 
 ---
@@ -116,6 +129,12 @@ import "rle"
 - `Decode(r io.Reader, w io.Writer) error`
 - `EncodeFile(inputPath, outputPath string) error`
 - `DecodeFile(inputPath, outputPath string) error`
+
+### 常量
+
+| 常量 | 值 | 描述 |
+|------|-----|------|
+| `MaxOutputSize` | 1 GiB | 最大输出大小，防止解压缩炸弹 |
 
 ### 错误处理
 

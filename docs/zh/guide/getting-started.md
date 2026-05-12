@@ -60,10 +60,10 @@ make build
 ### 构建特定算法
 
 ```bash
-make build-huffman      # Huffman 编码 (C++, Go, Rust)
-make build-arithmetic   # 算术编码
-make build-range        # 区间编码
-make build-rle          # 行程长度编码
+make build-huffman      # Huffman (C++, Go, Rust)
+make build-arithmetic   # Arithmetic
+make build-range        # Range Coder
+make build-rle          # RLE
 ```
 
 ### 手动编译
@@ -162,8 +162,8 @@ Compression ratio: 1.23
 |------|------|
 | `make build` | 构建所有算法实现 |
 | `make build-huffman` | 仅构建 Huffman 实现 |
-| `make build-arithmetic` | 仅构建算术编码实现 |
-| `make build-range` | 仅构建区间编码实现 |
+| `make build-arithmetic` | 仅构建 Arithmetic 实现 |
+| `make build-range` | 仅构建 Range Coder 实现 |
 | `make build-rle` | 仅构建 RLE 实现 |
 | `make test` | 运行单元、streaming、conformance 测试 |
 | `make test-conformance` | 运行跨语言解码矩阵 |
@@ -204,9 +204,9 @@ rustup update stable
 rustc --version  # 应为 1.70+
 ```
 
-### 区间编码性能
+### Range Coder 性能
 
-区间编码解码器对大于 500KB 的文件存在已知性能问题。请使用较小的测试文件：
+Range Coder 解码器对大于 500KB 的文件存在已知性能问题。请使用较小的测试文件：
 
 ```bash
 # 创建较小的测试文件 (100KB)

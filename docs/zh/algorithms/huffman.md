@@ -1,6 +1,6 @@
-# 霍夫曼编码
+# Huffman
 
-霍夫曼编码是一种无损数据压缩算法，使用**变长编码**来表示符号。出现频率较高的符号使用较短的编码，出现频率较低的符号使用较长的编码。
+Huffman 是一种无损数据压缩算法，使用**变长编码**来表示符号。出现频率较高的符号使用较短的编码，出现频率较低的符号使用较长的编码。
 
 ## 工作原理
 
@@ -128,7 +128,7 @@ fn build_huffman_tree(freq: &[u32; 256]) -> Option<Box<Node>> {
 ## 压缩效率
 
 - **理论上界**：平均编码长度 ≥ 熵 H
-- **霍夫曼上界**：H ≤ L < H + 1 位每符号
+- **Huffman 上界**：H ≤ L < H + 1 位每符号
 - **最适用于**：频率分布不均匀的数据
 
 ## 适用场景
@@ -199,6 +199,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 ## 延伸阅读
 
-- [算术编码](/zh/algorithms/arithmetic) — 使用分数位的更优压缩
-- [区间编码](/zh/algorithms/range) — 生产级优化的算术编码
+- [Arithmetic](/zh/algorithms/arithmetic) — 使用分数位的更优压缩
+- [Range Coder](/zh/algorithms/range) — 生产级优化实现
 - [算法对比](/zh/guide/algorithms)

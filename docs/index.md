@@ -3,8 +3,7 @@ layout: home
 
 hero:
   name: CompressKit
-  text: Compression algorithms you can trust
-  tagline: Production-ready Huffman, Arithmetic, Range, and RLE implementations in C++17, Go, and Rust with cross-language binary verification.
+  text: ' '
   actions:
     - theme: brand
       text: English
@@ -13,3 +12,18 @@ hero:
       text: 中文
       link: /zh/
 ---
+
+<script setup>
+import { onMounted } from 'vue'
+import { useRouter } from 'vitepress'
+
+onMounted(() => {
+  const router = useRouter()
+  const lang = navigator.language || navigator.userLanguage
+  if (lang.startsWith('zh')) {
+    router.go('/zh/')
+  } else {
+    router.go('/en/')
+  }
+})
+</script>

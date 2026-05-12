@@ -191,3 +191,57 @@ Streaming Layer 的核心控制逻辑，定义有效的状态转换。
 - `openspec/specs/core-architecture/spec.md` - 核心架构规范
 - `openspec/specs/encoding-project/spec.md` - 项目需求规范
 - `openspec/specs/cross-language-testing/spec.md` - 测试规范
+
+## 文档术语表
+
+本文节定义 Git Pages 文档（VitePress）中的术语翻译规范。
+
+### 算法名称
+
+| 英文 | 中文文档用法 | 说明 |
+|------|-------------|------|
+| Huffman | Huffman | 保留英文 |
+| Arithmetic | Arithmetic | 保留英文 |
+| Range Coder | Range Coder | 保留英文 |
+| RLE | RLE | 保留英文，首次出现可标注"行程编码" |
+
+### API 术语
+
+| 英文 | 中文翻译 | 说明 |
+|------|----------|------|
+| Streaming API | Streaming API | 保留英文，代码术语不翻译 |
+| Buffer Layer | 缓冲层 | 翻译 |
+| Streaming Layer | 流式层 | 翻译 |
+| CLI | CLI | 保留英文，通用术语 |
+| Import | 导入 | 翻译 |
+| Functions | 函数 | 翻译 |
+| Constants | 常量 | 翻译 |
+| Error Handling | 错误处理 | 翻译 |
+| Error Type | 错误类型 | 翻译 |
+| File Format | 文件格式 | 翻译 |
+| Usage | 用法 | 翻译 |
+| Internal Structure | 内部结构 | 翻译 |
+| Key Classes | 关键类 | 翻译 |
+| Common Patterns | 通用模式 | 翻译 |
+
+### 文档结构
+
+| 英文 | 中文翻译 | 说明 |
+|------|----------|------|
+| Getting Started | 快速开始 | 统一使用"快速开始" |
+| API Reference | API 参考 | 保留 API 英文 |
+| Benchmarks | 基准测试 | 翻译 |
+| Prerequisites | 前置条件 | 统一使用"前置条件" |
+| Troubleshooting | 故障排除 | 翻译 |
+
+### 性能术语
+
+| 英文 | 中文翻译 | 说明 |
+|------|----------|------|
+| encode/decode | 编码/解码 | 翻译 |
+| Encoder/Decoder | 编码器/解码器 | 翻译 |
+| encode time | 编码时间 | 翻译 |
+| decode time | 解码时间 | 翻译 |
+| compression ratio | 压缩比 | 翻译 |
+| throughput | 吞吐量 | 翻译 |
+| MiB/s | MiB/s | 保留单位 |

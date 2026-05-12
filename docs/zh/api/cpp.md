@@ -20,7 +20,9 @@ g++ -std=c++17 -O2 -Wall -Wextra -o <binary> main.cpp
 | `-fsanitize=address` | 地址消毒器（调试版本） |
 | `-fsanitize=undefined` | 未定义行为消毒器（调试版本） |
 
-## Huffman 编码 (`algorithms/huffman/cpp/main.cpp`)
+## Huffman (`algorithms/huffman/cpp/main.cpp`)
+
+### 用法
 
 ```bash
 ./huffman_cpp encode input.bin output.huf
@@ -44,7 +46,9 @@ g++ -std=c++17 -O2 -Wall -Wextra -o <binary> main.cpp
 
 ---
 
-## 算术编码 (`algorithms/arithmetic/cpp/main.cpp`)
+## Arithmetic (`algorithms/arithmetic/cpp/main.cpp`)
+
+### 用法
 
 ```bash
 ./arithmetic_cpp encode input.bin output.aenc
@@ -58,7 +62,9 @@ g++ -std=c++17 -O2 -Wall -Wextra -o <binary> main.cpp
 
 ---
 
-## 区间编码 (`algorithms/range/cpp/main.cpp`)
+## Range Coder (`algorithms/range/cpp/main.cpp`)
+
+### 用法
 
 ```bash
 ./rangecoder_cpp encode input.bin output.rcnc

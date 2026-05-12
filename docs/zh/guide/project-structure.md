@@ -40,8 +40,8 @@ openspec/          # 稳定规范与已归档设计变更
 | 算法 | 魔数/头部 | 扩展名 | 载荷 |
 |------|-----------|--------|------|
 | Huffman | `HFMN` + 频率表 | `.huf` | 比特流 |
-| 算术编码 | `AENC` + 频率表 | `.aenc` | 比特流 |
-| 区间编码 | `RCNC` + 频率表 | `.rcnc` | 字节流 |
+| Arithmetic | `AENC` + 频率表 | `.aenc` | 比特流 |
+| Range Coder | `RCNC` + 频率表 | `.rcnc` | 字节流 |
 | RLE | `RLE\x00` | `.rle` | 魔数 + `(count: uint32 LE, value: byte)` 对 |
 
 未来 shared-frame 提案已归档到 `openspec/changes/archive/`，不属于当前活跃文件格式契约。

@@ -66,38 +66,63 @@
   --ck-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* VitePress Override - Light Theme */
+/* VitePress Override - Light Theme (GitHub Style) */
 :root {
   --vp-c-brand-1: var(--ck-brand-1);
   --vp-c-brand-2: var(--ck-brand-2);
   --vp-c-brand-3: var(--ck-brand-3);
-  --vp-c-bg: var(--ck-slate-50);
-  --vp-c-bg-alt: var(--ck-slate-100);
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
+
+  /* Background Colors - GitHub Style */
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f6f8fa;
   --vp-c-bg-elv: #ffffff;
-  --vp-c-divider: var(--ck-slate-200);
-  --vp-c-text-1: var(--ck-slate-900);
-  --vp-c-text-2: var(--ck-slate-700);
-  --vp-c-text-3: var(--ck-slate-500);
+  --vp-c-bg-soft: #f6f8fa;
+
+  /* Text Colors - GitHub Style */
+  --vp-c-text-1: #24292f;
+  --vp-c-text-2: #57606a;
+  --vp-c-text-3: #8b949e;
+
+  /* Border Colors - GitHub Style */
+  --vp-c-border: #d0d7de;
+  --vp-c-divider: #d0d7de;
+  --vp-c-gutter: #d0d7de;
+
   --vp-button-brand-bg: var(--ck-brand-1);
   --vp-button-brand-hover-bg: var(--ck-brand-2);
   --vp-home-hero-name-color: var(--ck-brand-1);
+  --vp-home-hero-name-background: transparent;
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
   --vp-code-font-size: 14px;
 }
 
-/* VitePress Override - Dark Theme */
+/* VitePress Override - Dark Theme (GitHub Style) */
 .dark {
   --vp-c-brand-1: #60a5fa;
   --vp-c-brand-2: #3b82f6;
   --vp-c-brand-3: #2563eb;
-  --vp-c-bg: var(--ck-slate-900);
-  --vp-c-bg-alt: var(--ck-slate-800);
-  --vp-c-bg-elv: #1e293b;
-  --vp-c-divider: var(--ck-slate-700);
-  --vp-c-text-1: var(--ck-slate-50);
-  --vp-c-text-2: var(--ck-slate-200);
-  --vp-c-text-3: var(--ck-slate-400);
-  --vp-button-brand-bg: var(--ck-brand-2);
-  --vp-button-brand-hover-bg: var(--ck-brand-1);
+  --vp-c-brand-soft: rgba(96, 165, 250, 0.16);
+
+  /* Background Colors - GitHub Dark Style */
+  --vp-c-bg: #0d1117;
+  --vp-c-bg-alt: #161b22;
+  --vp-c-bg-elv: #21262d;
+  --vp-c-bg-soft: #21262d;
+
+  /* Text Colors - GitHub Dark Style */
+  --vp-c-text-1: #c9d1d9;
+  --vp-c-text-2: #8b949e;
+  --vp-c-text-3: #6e7681;
+
+  /* Border Colors - GitHub Dark Style */
+  --vp-c-border: #30363d;
+  --vp-c-divider: #30363d;
+  --vp-c-gutter: #30363d;
+
+  --vp-button-brand-bg: var(--vp-c-brand-2);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-1);
   --vp-home-hero-name-color: var(--vp-c-brand-1);
 }
 

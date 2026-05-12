@@ -1,118 +1,129 @@
 /* CompressKit Custom Components Styles */
 
-/* Hero Section Enhancements */
+/* Hero Section - Simplified Kimi-CLI Style */
 .VPHero {
-  padding: calc(var(--vp-nav-height) + var(--ck-space-16)) var(--ck-space-6) var(--ck-space-16);
+  padding: calc(var(--vp-nav-height) + 48px) var(--ck-space-6) 48px;
 }
 
 .VPHero .name {
-  background: var(--ck-gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  color: var(--vp-c-brand-1);
+  background: transparent;
+  -webkit-text-fill-color: unset;
 }
 
 .VPHero .text {
-  font-weight: 600;
-  color: var(--ck-slate-800);
-}
-
-.dark .VPHero .text {
-  color: var(--ck-slate-100);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+  margin-top: var(--ck-space-3);
 }
 
 .VPHero .tagline {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  color: var(--ck-slate-500);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vp-c-text-3);
+  margin-top: var(--ck-space-4);
   max-width: 600px;
 }
 
-.dark .VPHero .tagline {
-  color: var(--ck-slate-400);
+.VPHero .image {
+  display: none;
 }
 
-.VPHero .image-container {
-  width: 280px;
-  height: 280px;
-  filter: drop-shadow(0 25px 50px rgba(37, 99, 235, 0.25));
-  transition: transform var(--ck-transition-slow);
+/* Hero Buttons - Simplified */
+.VPHero .actions {
+  margin-top: var(--ck-space-8);
+  gap: var(--ck-space-3);
 }
 
-.VPHero .image-container:hover {
-  transform: scale(1.05);
+.VPHero .VPButton {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 150ms ease;
 }
 
-.dark .VPHero .image-container {
-  filter: drop-shadow(0 25px 50px rgba(37, 99, 235, 0.4));
+.VPHero .VPButton.medium.brand {
+  background: var(--vp-c-brand-1);
+  border: none;
+  color: #ffffff;
 }
 
-/* Feature Cards */
+.VPHero .VPButton.medium.brand:hover {
+  background: var(--vp-c-brand-2);
+}
+
+.VPHero .VPButton.medium.alt {
+  border: 1px solid var(--vp-c-border);
+  background: transparent;
+  color: var(--vp-c-text-1);
+}
+
+.VPHero .VPButton.medium.alt:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/* Feature Cards - Simplified GitHub Style */
 .VPFeatures {
-  padding: var(--ck-space-16) var(--ck-space-6);
+  padding: 48px var(--ck-space-6);
+}
+
+.VPFeatures .container {
+  max-width: 1200px;
 }
 
 .VPFeature {
-  background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(248,250,252,0.8) 100%);
-  border: 1px solid var(--ck-slate-200);
-  border-radius: var(--ck-radius-xl);
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 8px;
   padding: var(--ck-space-6);
-  transition: all var(--ck-transition-base);
+  transition: border-color 150ms ease;
   position: relative;
   overflow: hidden;
 }
 
-.dark .VPFeature {
-  background: linear-gradient(180deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.8) 100%);
-  border-color: var(--ck-slate-700);
-}
-
 .VPFeature::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--ck-gradient-primary);
-  opacity: 0;
-  transition: opacity var(--ck-transition-base);
+  content: none;
 }
 
 .VPFeature:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--ck-shadow-xl);
-  border-color: var(--ck-brand-3);
+  border-color: var(--vp-c-brand-1);
+  transform: none;
+  box-shadow: none;
 }
 
 .VPFeature:hover::before {
-  opacity: 1;
+  opacity: 0;
 }
 
 .VPFeature .icon {
-  font-size: 2rem;
-  margin-bottom: var(--ck-space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  margin-bottom: var(--ck-space-3);
 }
 
 .VPFeature .title {
-  font-size: 1.125rem;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--ck-slate-900);
   margin-bottom: var(--ck-space-2);
-}
-
-.dark .VPFeature .title {
-  color: var(--ck-slate-100);
+  color: var(--vp-c-text-1);
 }
 
 .VPFeature .details {
-  font-size: 0.9375rem;
+  font-size: 14px;
   line-height: 1.6;
-  color: var(--ck-slate-500);
-}
-
-.dark .VPFeature .details {
-  color: var(--ck-slate-400);
+  color: var(--vp-c-text-2);
 }
 
 /* Custom Buttons */
@@ -531,20 +542,231 @@
     width: 200px;
     height: 200px;
   }
-  
+
   .ck-stats-bar {
     gap: var(--ck-space-6);
   }
-  
+
   .ck-stat-value {
     font-size: 1.875rem;
   }
-  
+
   .ck-section-title {
     font-size: 1.5rem;
   }
-  
+
   .ck-code-comparison {
     grid-template-columns: 1fr;
+  }
+}
+
+/* === Custom Homepage Styles (Kimi-CLI Style) === */
+
+/* Homepage Header */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--ck-space-4) 0;
+  margin-bottom: var(--ck-space-8);
+  border-bottom: 1px solid var(--vp-c-border);
+}
+
+.home-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--ck-space-3);
+}
+
+.home-logo {
+  width: 32px;
+  height: 32px;
+  background: var(--vp-c-brand-1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.home-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--vp-c-text-1);
+}
+
+.home-subtitle {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  margin-left: var(--ck-space-2);
+}
+
+.home-nav {
+  display: flex;
+  gap: var(--ck-space-4);
+  font-size: 13px;
+}
+
+.home-nav a {
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+}
+
+.home-nav a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* Intro + Stats */
+.home-intro-row {
+  display: flex;
+  gap: var(--ck-space-6);
+  margin-bottom: var(--ck-space-8);
+}
+
+.home-intro {
+  flex: 1;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.home-stats {
+  display: flex;
+  gap: var(--ck-space-4);
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+  flex-shrink: 0;
+}
+
+.home-stats strong {
+  color: var(--vp-c-text-1);
+}
+
+/* Feature Map */
+.feature-map {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--ck-space-4);
+  margin-bottom: var(--ck-space-8);
+}
+
+.feature-card {
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  padding: var(--ck-space-4);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.feature-card:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.feature-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--vp-c-text-1);
+  margin-bottom: var(--ck-space-3);
+}
+
+.feature-card-desc {
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+  line-height: 1.6;
+  margin-bottom: var(--ck-space-3);
+}
+
+.feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feature-tag {
+  font-size: 12px;
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  padding: 3px 8px;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 4px;
+}
+
+.feature-tag:hover {
+  background: rgba(37, 99, 235, 0.15);
+}
+
+/* Quick Start */
+.quick-start {
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  padding: var(--ck-space-4);
+}
+
+.quick-start-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--vp-c-text-1);
+  margin-bottom: var(--ck-space-2);
+}
+
+.quick-start-content {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.quick-start-content code {
+  background: var(--vp-c-bg-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--vp-c-brand-1);
+}
+
+/* Command Block */
+.command-block {
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 8px;
+  padding: var(--ck-space-4);
+  margin: var(--ck-space-4) 0;
+}
+
+.command-block code {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--vp-c-text-1);
+}
+
+/* Homepage Responsive */
+@media (max-width: 959px) {
+  .feature-map {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-intro-row {
+    flex-direction: column;
+    gap: var(--ck-space-4);
+  }
+}
+
+@media (max-width: 639px) {
+  .feature-map {
+    grid-template-columns: 1fr;
+  }
+
+  .home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ck-space-3);
+  }
+
+  .home-nav {
+    width: 100%;
+    justify-content: flex-start;
   }
 }

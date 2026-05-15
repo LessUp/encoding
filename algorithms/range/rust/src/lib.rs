@@ -2,9 +2,9 @@ use std::error::Error;
 use std::fmt;
 
 use compresskit_codec::codec::{
-    build_cumulative, build_scaled_frequencies, read_frequencies_exact, write_frequencies,
-    CodecError, Decoder, Encoder, FrequencyError, EOF_SYMBOL, SYMBOL_LIMIT, streaming_decoder,
-    streaming_encoder,
+    build_cumulative, build_scaled_frequencies, read_frequencies, streaming_decoder,
+    streaming_encoder, write_frequencies, CodecError, Decoder, Encoder, FrequencyError, EOF_SYMBOL,
+    SYMBOL_LIMIT,
 };
 
 const MAX_TOTAL: u32 = 1 << 24;
@@ -35,15 +35,18 @@ fn read_header(input: &[u8], pos: &mut usize) -> Result<Vec<u32>, RangeError> {
         return Err(RangeError("range: bad magic"));
     }
     *pos = 4;
-    read_frequencies_exact(
+    let freq = read_frequencies(
         input,
         pos,
-        SYMBOL_LIMIT,
         "range: truncated header",
         "range: truncated frequencies",
         "range: bad symbol count",
     )
-    .map_err(map_frequency_error)
+    .map_err(map_frequency_error)?;
+    if freq.len() != SYMBOL_LIMIT {
+        return Err(RangeError("range: unexpected symbol count"));
+    }
+    Ok(freq)
 }
 
 struct RangeEncoder<'a> {
@@ -279,5 +282,19 @@ mod tests {
         let err = decode(&encoded).unwrap_err();
 
         assert_eq!(err.to_string(), "range: truncated frequencies");
+    }
+
+    #[test]
+    fn decode_reports_unexpected_symbol_count_for_complete_nonstandard_header() {
+        let mut encoded = Vec::new();
+        encoded.extend_from_slice(b"RCNC");
+        encoded.extend_from_slice(&256u32.to_le_bytes());
+        for _ in 0..256 {
+            encoded.extend_from_slice(&1u32.to_le_bytes());
+        }
+
+        let err = decode(&encoded).unwrap_err();
+
+        assert_eq!(err.to_string(), "range: unexpected symbol count");
     }
 }

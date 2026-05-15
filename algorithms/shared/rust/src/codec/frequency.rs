@@ -3,6 +3,7 @@ use std::fmt;
 
 pub const SYMBOL_LIMIT: usize = 257;
 pub const EOF_SYMBOL: u32 = (SYMBOL_LIMIT - 1) as u32;
+const MAX_READ_FREQUENCY_COUNT: usize = 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FrequencyErrorKind {
@@ -130,7 +131,8 @@ pub fn read_frequencies_exact(
     invalid_count_message: &'static str,
 ) -> Result<Vec<u32>, FrequencyError> {
     let count = read_u32_le(input, pos)
-        .ok_or_else(|| FrequencyError::truncated(truncated_count_message))? as usize;
+        .ok_or_else(|| FrequencyError::truncated(truncated_count_message))?
+        as usize;
     if count != expected_count {
         return Err(FrequencyError::corrupt(invalid_count_message));
     }
@@ -143,12 +145,40 @@ pub fn read_frequencies_exact(
     Ok(freq)
 }
 
+pub fn read_frequencies(
+    input: &[u8],
+    pos: &mut usize,
+    truncated_count_message: &'static str,
+    truncated_entries_message: &'static str,
+    invalid_count_message: &'static str,
+) -> Result<Vec<u32>, FrequencyError> {
+    let count = read_u32_le(input, pos)
+        .ok_or_else(|| FrequencyError::truncated(truncated_count_message))?
+        as usize;
+    if count == 0 || count > MAX_READ_FREQUENCY_COUNT {
+        return Err(FrequencyError::corrupt(invalid_count_message));
+    }
+
+    let mut freq = Vec::with_capacity(count);
+    for _ in 0..count {
+        freq.push(
+            read_u32_le(input, pos)
+                .ok_or_else(|| FrequencyError::truncated(truncated_entries_message))?,
+        );
+    }
+    Ok(freq)
+}
+
 fn read_u32_le(input: &[u8], pos: &mut usize) -> Option<u32> {
     if *pos + 4 > input.len() {
         return None;
     }
-    let value =
-        u32::from_le_bytes([input[*pos], input[*pos + 1], input[*pos + 2], input[*pos + 3]]);
+    let value = u32::from_le_bytes([
+        input[*pos],
+        input[*pos + 1],
+        input[*pos + 2],
+        input[*pos + 3],
+    ]);
     *pos += 4;
     Some(value)
 }
@@ -156,8 +186,8 @@ fn read_u32_le(input: &[u8], pos: &mut usize) -> Option<u32> {
 #[cfg(test)]
 mod tests {
     use super::{
-        build_cumulative, build_cumulative_strict, build_scaled_frequencies, read_frequencies_exact,
-        EOF_SYMBOL, FrequencyErrorKind,
+        build_cumulative, build_cumulative_strict, build_scaled_frequencies, read_frequencies,
+        read_frequencies_exact, FrequencyErrorKind, EOF_SYMBOL,
     };
 
     #[test]
@@ -213,6 +243,25 @@ mod tests {
 
         assert_eq!(err.kind, FrequencyErrorKind::Truncated);
         assert_eq!(err.message, "truncated entries");
+    }
+
+    #[test]
+    fn read_frequencies_accepts_non_exact_count_within_supported_range() {
+        let input = [
+            2, 0, 0, 0, // count
+            1, 0, 0, 0, 3, 0, 0, 0,
+        ];
+        let mut pos = 0;
+        let freq = read_frequencies(
+            &input,
+            &mut pos,
+            "truncated count",
+            "truncated entries",
+            "wrong symbol count",
+        )
+        .unwrap();
+
+        assert_eq!(freq, vec![1, 3]);
     }
 
     #[test]

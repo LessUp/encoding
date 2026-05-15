@@ -180,7 +180,7 @@ pub fn encode(input: &[u8]) -> Result<Vec<u8>, RangeError> {
         for &b in input {
             enc.encode_symbol(b as u32, &cumulative)?;
         }
-        enc.encode_symbol(EOF_SYMBOL as u32, &cumulative)?;
+        enc.encode_symbol(EOF_SYMBOL, &cumulative)?;
         enc.finish();
     }
 

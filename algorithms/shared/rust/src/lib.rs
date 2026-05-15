@@ -19,8 +19,8 @@ pub mod codec {
     };
     pub use frequency::{
         build_cumulative, build_cumulative_strict, build_frequencies, build_scaled_frequencies,
-        read_frequencies_exact, scale_frequencies, write_frequencies, FrequencyError,
-        FrequencyErrorKind, EOF_SYMBOL, SYMBOL_LIMIT,
+        read_frequencies, read_frequencies_exact, scale_frequencies, write_frequencies,
+        FrequencyError, FrequencyErrorKind, EOF_SYMBOL, SYMBOL_LIMIT,
     };
     pub use streaming::{streaming_decoder, streaming_encoder};
     pub use write::WriteEncoder;

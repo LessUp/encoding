@@ -12,7 +12,8 @@ from pathlib import Path
 #
 # 用法：
 #   python3 bench.py [/path/to/input.bin]
-# 若未提供参数，则默认使用项目根目录下 tests/data/random_10MiB.bin
+# 若未提供参数，则默认使用项目根目录下 tests/data/small_dictionary_like.bin
+# （该样本小于 100 KiB，符合 Range benchmark 对小输入的约束）
 
 ROOT = Path(__file__).resolve().parent.parent
 CPP_DIR = ROOT / "cpp"
@@ -22,6 +23,7 @@ BENCH_DIR = ROOT / "benchmark"
 TMP_DIR = BENCH_DIR / "tmp"
 PROJECT_ROOT = ROOT.parent.parent
 TEST_DATA_DIR = PROJECT_ROOT / "tests" / "data"
+DEFAULT_INPUT = TEST_DATA_DIR / "small_dictionary_like.bin"
 
 
 def run(cmd, cwd):
@@ -72,11 +74,11 @@ def main():
             sys.stderr.write("Input file does not exist\n")
             sys.exit(1)
     else:
-        input_path = TEST_DATA_DIR / "random_10MiB.bin"
+        input_path = DEFAULT_INPUT
 
     if not input_path.is_file():
         sys.stderr.write(f"Input file not found: {input_path}\n")
-        sys.stderr.write("请先运行 tests/gen_testdata.py 生成测试数据\n")
+        sys.stderr.write("Run tests/gen_testdata.py to generate benchmark fixtures.\n")
         sys.exit(1)
 
     build_times = compile_all()

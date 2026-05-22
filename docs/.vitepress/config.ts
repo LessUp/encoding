@@ -3,6 +3,7 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 import llmstxt from 'vitepress-plugin-llms'
 import footnote from 'markdown-it-footnote'
 import mark from 'markdown-it-mark'
+import { buildNav, buildSidebar } from './data/site-content.mjs'
 
 const rawBase = process.env.VITEPRESS_BASE
 const base = rawBase
@@ -10,151 +11,6 @@ const base = rawBase
     ? rawBase.endsWith('/') ? rawBase : `${rawBase}/`
     : `/${rawBase}/`
   : '/'
-
-// Shared sidebar configuration
-const sharedSidebar = {
-  '/en/': [
-    {
-      text: 'Getting Started',
-      items: [
-        { text: 'Introduction', link: '/en/' },
-        { text: 'Quick Start', link: '/en/guide/getting-started' },
-        { text: 'Architecture', link: '/en/guide/architecture' },
-        { text: 'Project Structure', link: '/en/guide/project-structure' },
-      ],
-    },
-    {
-      text: 'Academy',
-      items: [
-        { text: 'Algorithm Academy', link: '/en/academy/' },
-        { text: 'Huffman Coding', link: '/en/academy/huffman' },
-        { text: 'State Machine Design', link: '/en/academy/state-machine' },
-      ],
-    },
-    {
-      text: 'Algorithms',
-      items: [
-        { text: 'Overview', link: '/en/guide/algorithms' },
-        { text: 'Huffman Coding', link: '/en/algorithms/huffman' },
-        { text: 'Arithmetic Coding', link: '/en/algorithms/arithmetic' },
-        { text: 'Range Coder', link: '/en/algorithms/range' },
-        { text: 'Run-Length Encoding', link: '/en/algorithms/rle' },
-      ],
-    },
-    {
-      text: 'API Reference',
-      items: [
-        { text: 'Streaming API', link: '/en/api/streaming' },
-        { text: 'Go Library', link: '/en/api/go' },
-        { text: 'Rust Crate', link: '/en/api/rust' },
-        { text: 'C++ Header', link: '/en/api/cpp' },
-      ],
-    },
-    {
-      text: 'Benchmarks & Testing',
-      items: [
-        { text: 'Performance Results', link: '/en/benchmarks/results' },
-        { text: 'How to Run', link: '/en/benchmarks/how-to-run' },
-        { text: 'Cross-Language Testing', link: '/en/testing/cross-language' },
-      ],
-    },
-    {
-      text: 'Reference',
-      items: [
-        { text: 'Architecture Design', link: '/en/architecture/' },
-        { text: 'Bibliography', link: '/en/reference/bibliography' },
-        { text: 'OpenSpec Specs', link: 'https://github.com/LessUp/compress-kit/tree/master/openspec/specs' },
-        { text: 'Contributing', link: '/en/guide/contributing' },
-        { text: 'Changelog', link: '/en/release-notes/changelog' },
-      ],
-    },
-  ],
-  '/zh/': [
-    {
-      text: '开始使用',
-      items: [
-        { text: '项目介绍', link: '/zh/' },
-        { text: '快速开始', link: '/zh/guide/getting-started' },
-        { text: '架构设计', link: '/zh/guide/architecture' },
-        { text: '项目结构', link: '/zh/guide/project-structure' },
-      ],
-    },
-    {
-      text: '学院',
-      items: [
-        { text: '算法学院', link: '/zh/academy/' },
-        { text: '霍夫曼编码深度解析', link: '/zh/academy/huffman' },
-        { text: '状态机设计哲学', link: '/zh/academy/state-machine' },
-      ],
-    },
-    {
-      text: '算法详解',
-      items: [
-        { text: '算法综述', link: '/zh/guide/algorithms' },
-        { text: '霍夫曼编码', link: '/zh/algorithms/huffman' },
-        { text: '算术编码', link: '/zh/algorithms/arithmetic' },
-        { text: '区间编码', link: '/zh/algorithms/range' },
-        { text: '行程编码', link: '/zh/algorithms/rle' },
-      ],
-    },
-    {
-      text: 'API 参考',
-      items: [
-        { text: 'Streaming API', link: '/zh/api/streaming' },
-        { text: 'Go 库', link: '/zh/api/go' },
-        { text: 'Rust 包', link: '/zh/api/rust' },
-        { text: 'C++ 头文件', link: '/zh/api/cpp' },
-      ],
-    },
-    {
-      text: '基准测试',
-      items: [
-        { text: '性能结果', link: '/zh/benchmarks/results' },
-        { text: '如何运行', link: '/zh/benchmarks/how-to-run' },
-        { text: '跨语言测试', link: '/zh/testing/cross-language' },
-      ],
-    },
-    {
-      text: '参考',
-      items: [
-        { text: '系统架构设计', link: '/zh/architecture/' },
-        { text: '参考文献', link: '/zh/reference/bibliography' },
-        { text: 'OpenSpec 规范', link: 'https://github.com/LessUp/compress-kit/tree/master/openspec/specs' },
-        { text: '参与贡献', link: '/zh/guide/contributing' },
-        { text: '更新日志', link: '/zh/release-notes/changelog' },
-      ],
-    },
-  ],
-}
-
-// Shared nav configuration
-const sharedNav = (lang: string) => [
-  {
-    text: lang === 'zh' ? '首页' : 'Home',
-    link: lang === 'zh' ? '/zh/' : '/en/',
-    activeMatch: lang === 'zh' ? '^/zh/$' : '^/en/$'
-  },
-  {
-    text: lang === 'zh' ? '开始' : 'Get Started',
-    link: lang === 'zh' ? '/zh/guide/getting-started' : '/en/guide/getting-started',
-    activeMatch: lang === 'zh' ? '/zh/guide/' : '/en/guide/'
-  },
-  {
-    text: lang === 'zh' ? '算法' : 'Algorithms',
-    link: lang === 'zh' ? '/zh/guide/algorithms' : '/en/guide/algorithms',
-    activeMatch: lang === 'zh' ? '/zh/algorithms/' : '/en/algorithms/'
-  },
-  {
-    text: 'API',
-    link: lang === 'zh' ? '/zh/api/go' : '/en/api/go',
-    activeMatch: lang === 'zh' ? '/zh/api/' : '/en/api/'
-  },
-  {
-    text: lang === 'zh' ? '基准' : 'Benchmarks',
-    link: lang === 'zh' ? '/zh/benchmarks/results' : '/en/benchmarks/results',
-    activeMatch: lang === 'zh' ? '/zh/benchmarks/' : '/en/benchmarks/'
-  },
-]
 
 export default withMermaid(defineConfig({
   base,
@@ -175,8 +31,8 @@ export default withMermaid(defineConfig({
       lang: 'en-US',
       link: '/en/',
       themeConfig: {
-        nav: sharedNav('en'),
-        sidebar: sharedSidebar['/en/'],
+        nav: buildNav('en'),
+        sidebar: buildSidebar('en'),
         editLink: {
           pattern: 'https://github.com/LessUp/compress-kit/edit/master/docs/:path',
           text: 'Edit this page on GitHub',
@@ -223,8 +79,8 @@ export default withMermaid(defineConfig({
       lang: 'zh-CN',
       link: '/zh/',
       themeConfig: {
-        nav: sharedNav('zh'),
-        sidebar: sharedSidebar['/zh/'],
+        nav: buildNav('zh'),
+        sidebar: buildSidebar('zh'),
         editLink: {
           pattern: 'https://github.com/LessUp/compress-kit/edit/master/docs/:path',
           text: '在 GitHub 上编辑此页',

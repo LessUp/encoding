@@ -1,74 +1,12 @@
 <script setup lang="ts">
 import { useData, withBase } from 'vitepress'
 import { computed } from 'vue'
+import { getAlgorithmCards } from '../../data/site-content.mjs'
 
 const { localeIndex } = useData()
 const lang = computed(() => localeIndex.value === 'root' ? 'en' : localeIndex.value)
+const algorithms = computed(() => getAlgorithmCards(lang.value))
 const algoLink = (slug: string) => withBase(`/${lang.value}/algorithms/${slug}`)
-
-interface Algorithm {
-  id: string
-  name: string
-  slug: string
-  icon: string
-  description: string
-  compression: 'Medium' | 'High' | 'Variable' | 'Low'
-  speed: 'Fast' | 'Medium' | 'Slow' | 'Very Fast'
-  bestFor: string[]
-  compressionLevel: 'medium' | 'high' | 'variable'
-  speedLevel: 'fast' | 'medium' | 'slow' | 'very-fast'
-}
-
-const algorithms: Algorithm[] = [
-  {
-    id: 'huffman',
-    name: 'Huffman Coding',
-    slug: 'huffman',
-    icon: '🌳',
-    description: 'Optimal prefix codes based on symbol frequency. The classic approach to lossless compression.',
-    compression: 'Medium',
-    speed: 'Fast',
-    bestFor: ['Text files', 'General data', 'Natural language'],
-    compressionLevel: 'medium',
-    speedLevel: 'fast'
-  },
-  {
-    id: 'arithmetic',
-    name: 'Arithmetic Coding',
-    slug: 'arithmetic',
-    icon: '🧮',
-    description: 'Entire message encoded as a single number. Achieves entropy limit for maximum compression.',
-    compression: 'High',
-    speed: 'Medium',
-    bestFor: ['Maximum compression', 'Statistical data', 'Archival storage'],
-    compressionLevel: 'high',
-    speedLevel: 'medium'
-  },
-  {
-    id: 'range',
-    name: 'Range Coder',
-    slug: 'range',
-    icon: '🎯',
-    description: 'Integer-based arithmetic coding. Production-ready balance of speed and compression.',
-    compression: 'High',
-    speed: 'Fast',
-    bestFor: ['Production systems', 'Real-time compression', 'Balanced workloads'],
-    compressionLevel: 'high',
-    speedLevel: 'fast'
-  },
-  {
-    id: 'rle',
-    name: 'Run-Length Encoding',
-    slug: 'rle',
-    icon: '📏',
-    description: 'Simple and fast compression for repetitive data. Often used as preprocessing.',
-    compression: 'Variable',
-    speed: 'Very Fast',
-    bestFor: ['Bitmap images', 'Log files', 'Preprocessing step'],
-    compressionLevel: 'variable',
-    speedLevel: 'very-fast'
-  }
-]
 
 const getCompressionBadgeClass = (level: string) => {
   switch (level) {
@@ -103,10 +41,10 @@ const getSpeedBadgeClass = (level: string) => {
           <h3>{{ algo.name }}</h3>
           <div class="badges">
             <span :class="['badge', getCompressionBadgeClass(algo.compressionLevel)]">
-              {{ algo.compression }} Compression
+            {{ algo.compression }} {{ algo.compressionSuffix }}
             </span>
             <span :class="['badge', getSpeedBadgeClass(algo.speedLevel)]">
-              {{ algo.speed }} Speed
+            {{ algo.speed }} {{ algo.speedSuffix }}
             </span>
           </div>
         </div>
@@ -115,14 +53,14 @@ const getSpeedBadgeClass = (level: string) => {
       <p class="algorithm-description">{{ algo.description }}</p>
       
       <div class="best-for">
-        <span class="label">Best for:</span>
+        <span class="label">{{ algo.bestForLabel }}</span>
         <div class="tags">
           <span v-for="use in algo.bestFor" :key="use" class="tag">{{ use }}</span>
         </div>
       </div>
       
       <div class="card-footer">
-        <span class="learn-more">Learn more →</span>
+        <span class="learn-more">{{ algo.learnMoreLabel }} →</span>
       </div>
     </a>
   </div>

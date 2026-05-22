@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect } from 'vue'
+import { useData } from 'vitepress'
 import benchmarkData from '../../data/benchmarks.json'
+import { getBenchmarkContent } from '../../data/site-content.mjs'
 import { getBarHeight as getMetricBarHeight, isBestCompressionRatio } from './benchmarkChartMetrics.js'
 
 interface BenchmarkResult {
@@ -16,35 +18,28 @@ interface BenchmarkResult {
 }
 
 const results = ref<BenchmarkResult[]>(benchmarkData.results)
+const { localeIndex } = useData()
+const locale = computed(() => (localeIndex.value === 'root' ? 'en' : localeIndex.value))
+const content = computed(() => getBenchmarkContent(locale.value))
 
-const algorithms = ['huffman', 'arithmetic', 'range', 'rle']
-const languages = ['cpp', 'go', 'rust']
+const algorithms = computed(() => content.value.algorithms.map(entry => entry.id))
+const languages = computed(() => content.value.languages.map(entry => entry.id))
 const datasetOrder = ['textlike_10MiB', 'repetitive_10MiB', 'small_dictionary_like']
-
-const languageColors: Record<string, string> = {
-  cpp: '#667eea',
-  go: '#00add8',
-  rust: '#de6e4b'
-}
-
-const languageNames: Record<string, string> = {
-  cpp: 'C++',
-  go: 'Go',
-  rust: 'Rust'
-}
-
-const algorithmNames: Record<string, string> = {
-  huffman: 'Huffman',
-  arithmetic: 'Arithmetic',
-  range: 'Range',
-  rle: 'RLE'
-}
-
-const datasetNames: Record<string, string> = {
-  textlike_10MiB: 'Text-like (10 MiB)',
-  repetitive_10MiB: 'Repetitive (10 MiB)',
-  small_dictionary_like: 'Small dictionary-like sample'
-}
+const languageColors = computed(() =>
+  Object.fromEntries(content.value.languages.map(entry => [entry.id, entry.color]))
+)
+const languageNames = computed(() =>
+  Object.fromEntries(content.value.languages.map(entry => [entry.id, entry.label]))
+)
+const algorithmNames = computed(() =>
+  Object.fromEntries(content.value.algorithms.map(entry => [entry.id, entry.label]))
+)
+const datasetNames = computed(() =>
+  Object.fromEntries(content.value.datasets.map(entry => [entry.id, entry.label]))
+)
+const metricNames = computed(() =>
+  Object.fromEntries(content.value.metrics.map(entry => [entry.id, entry.label]))
+)
 
 const selectedMetric = ref<'encodeSpeed' | 'decodeSpeed' | 'compressionRatio'>('encodeSpeed')
 const selectedDataset = ref('')
@@ -74,7 +69,7 @@ const filteredResults = computed(() => {
 
 const groupedByAlgorithm = computed(() => {
   const grouped: Record<string, BenchmarkResult[]> = {}
-  algorithms.forEach(algo => {
+  algorithms.value.forEach(algo => {
     grouped[algo] = filteredResults.value.filter(r => r.algorithm === algo)
   })
   return grouped
@@ -88,12 +83,7 @@ const maxValue = computed(() => {
 const compressionRatios = computed(() => filteredResults.value.map(r => r.compressionRatio))
 
 const formatMetricName = (metric: string): string => {
-  const names: Record<string, string> = {
-    encodeSpeed: 'Encode Speed (MiB/s)',
-    decodeSpeed: 'Decode Speed (MiB/s)',
-    compressionRatio: 'Size Saved Relative to Input'
-  }
-  return names[metric] || metric
+  return metricNames.value[metric] || metric
 }
 
 const getBarHeight = (value: number): number => {
@@ -115,10 +105,10 @@ const formatMetricValue = (value: number): string => {
 <template>
   <div class="benchmark-chart-container">
     <div class="chart-header">
-      <h3 class="chart-title">Performance Comparison</h3>
+      <h3 class="chart-title">{{ content.title }}</h3>
       <div class="chart-controls">
         <div class="control-group">
-          <label>Dataset:</label>
+          <label>{{ content.datasetLabel }}</label>
           <select v-model="selectedDataset">
             <option v-for="dataset in datasetOptions" :key="dataset" :value="dataset">
               {{ datasetNames[dataset] || dataset }}
@@ -126,11 +116,15 @@ const formatMetricValue = (value: number): string => {
           </select>
         </div>
         <div class="control-group">
-          <label>Metric:</label>
+          <label>{{ content.metricLabel }}</label>
           <select v-model="selectedMetric">
-            <option value="encodeSpeed">Encode Speed</option>
-            <option value="decodeSpeed">Decode Speed</option>
-            <option value="compressionRatio">Compression Ratio</option>
+            <option
+              v-for="metric in content.metricOptions"
+              :key="metric.id"
+              :value="metric.id"
+            >
+              {{ metric.label }}
+            </option>
           </select>
         </div>
       </div>
@@ -169,7 +163,7 @@ const formatMetricValue = (value: number): string => {
     </div>
 
     <div v-if="selectedMetric === 'compressionRatio'" class="metric-note">
-      Bars show size saved relative to input; labels show the actual output/input ratio, and the best ratio is highlighted.
+      {{ content.compressionNote }}
     </div>
     <div class="metric-label">{{ formatMetricName(selectedMetric) }}</div>
   </div>

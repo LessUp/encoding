@@ -1,6 +1,6 @@
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import { h, onMounted, watch, nextTick } from 'vue'
+import { onMounted, watch, nextTick } from 'vue'
 import { useData } from 'vitepress'
 import './styles/vars.css'
 
@@ -8,15 +8,9 @@ import './styles/vars.css'
 import AlgorithmGrid from './components/AlgorithmGrid.vue'
 import BenchmarkChart from './components/BenchmarkChart.vue'
 import CodeComparison from './components/CodeComparison.vue'
-import LanguageDetector from './components/LanguageDetector.vue'
 
 export default {
   extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      'layout-bottom': () => h(LanguageDetector),
-    })
-  },
   enhanceApp({ app }) {
     // Register custom components globally
     app.component('AlgorithmGrid', AlgorithmGrid)

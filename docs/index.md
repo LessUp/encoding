@@ -15,24 +15,21 @@ hero:
 
 <script setup>
 import { onBeforeMount } from 'vue'
+import { getLandingRedirectTarget, readSavedLocale } from './.vitepress/theme/utils/language-preference.mjs'
 
 // Client-only execution for SSR compatibility
 onBeforeMount(() => {
   if (typeof window === 'undefined') return
 
-  const base = import.meta.env.BASE_URL
-  const userLang = navigator.language || navigator.userLanguage || ''
-  const savedLang = localStorage.getItem('docs-lang-preference')
+  const target = getLandingRedirectTarget({
+    pathname: window.location.pathname,
+    base: import.meta.env.BASE_URL,
+    savedLocale: readSavedLocale(window.localStorage),
+    browserLanguage: navigator.language || navigator.userLanguage || '',
+  })
 
-  // Use saved preference if exists, otherwise use browser language
-  const targetLang = savedLang || (userLang.startsWith('zh') ? `${base}zh/` : `${base}en/`)
-  const currentPath = window.location.pathname
-
-  // Only redirect if not already on correct language path
-  if (targetLang.endsWith('/zh/') && !currentPath.includes('/zh/')) {
-    window.location.replace(`${base}zh/`)
-  } else if (targetLang.endsWith('/en/') && !currentPath.includes('/en/')) {
-    window.location.replace(`${base}en/`)
+  if (target && target !== window.location.pathname) {
+    window.location.replace(target)
   }
 })
 </script>
